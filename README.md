@@ -55,7 +55,7 @@ class Plot1(GraphScene):
 
 输出结果：
 
-[graph](./img/1.png)
+<img src="./img/1.png" alt="graph" style="zoom: 33%;" />
 
 以上都是`manim`默认设置的`graph`，但有时我们需要**定制**适合自己的坐标系。
 
@@ -71,9 +71,11 @@ class Plot1(GraphScene):
 
 输出结果：
 
-[graph](./img/2.png)
+<img src="./img/2.png" alt="graph" style="zoom:50%;" />
 
-由于横纵坐标的最大值为10，而间隔为2，所以最终不会显示10的`tick`，解决方法是：要么改变`x_tick_frequency`和`y_tick_frequency`，要么改变`x_max`和`y_max`使最大值有对应的`tick`。
+由于横纵坐标的最大值为10，而间隔为2，所以最终不会显示10的`tick`。
+
+解决方法是：要么改变`x_tick_frequency`和`y_tick_frequency`，要么改变`x_max`和`y_max`使最大值有对应的`tick`。
 
 ```python
 "x_max":11,
@@ -86,5 +88,5 @@ class Plot1(GraphScene):
 
 输出结果：
 
-[graph](./img/3.png)
+<img src="./img/3.png" alt="graph" style="zoom:50%;" />
 
