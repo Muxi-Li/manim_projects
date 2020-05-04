@@ -8,7 +8,7 @@
 
 我们要显示函数图像，首先要设置坐标轴，才能让函数图像在坐标轴上显示出来。
 
-以下是一般的设置方法：
+以下是一般的设置方法：（CONFIG里的参数如果默认的话可以不用定义）
 
 ```python
 class Plot1(GraphScene):
@@ -17,7 +17,7 @@ class Plot1(GraphScene):
         "x_max": 10,		# 横坐标最大值
         "x_axis_width": 9,	# 整个画面的宽度是14，可以设置x轴所占的宽度
         "x_tick_frequency": 1,	  # x轴刻度间隔
-        "x_leftmost_tick": None,  # None的话显示tick，设想：可不可以显示其他类型的tick？
+        "x_leftmost_tick": None,  # None的话显示默认tick，设想：可不可以显示其他类型的tick？
         "x_labeled_nums": None,	  # 横坐标刻度值，传入列表
         "x_axis_label": "$x$",	  # 就是横坐标的label，一般是x
         "y_min": -1,			  # 纵坐标的最小值
@@ -57,9 +57,9 @@ class Plot1(GraphScene):
 
 <img src="./img/1.png" alt="graph" style="zoom: 33%;" />
 
-以上都是`manim`默认设置的`graph`，但有时我们需要**定制**适合自己的坐标系。
+以上都是`manim`默认设置的`graph`，但有时我们需要**定制**适合自己的坐标系。这里主要展示我平时制作视频时遇到的问题。
 
-1. 显示坐标轴刻度值，并且间隔为2
+1. **显示坐标轴刻度值，并且间隔为2**
 
 ```python
 # 只需改改CONFIG中的参数即可
@@ -89,4 +89,76 @@ class Plot1(GraphScene):
 输出结果：
 
 <img src="./img/3.png" alt="graph" style="zoom:50%;" />
+
+2. **至少其中一个坐标轴的原点不是从0开始的**
+
+视频中的画面是有大小的，有时候我们只需要查看函数图像从某一个值开始的情况，比如x>20的情况，这时候画面可能并不会显示函数图像，就如上面的设置，横坐标到11就差不多到边界了。以前曾天真的scale()坐标系，真是太痛苦了。
+
+```python
+class PlotGraph(GraphScene):
+    CONFIG = {
+        "y_max" : 50,
+        "y_min" : 20,
+        "x_max" : 7,
+        "x_min" : 4,
+        "y_tick_frequency" : 5, 
+        "x_tick_frequency" : 1,
+        "axes_color" : BLUE,
+        "y_labeled_nums": range(30,60,10),
+        "x_labeled_nums": list(np.arange(4, 8)),
+        # "x_label_decimal":1,
+        "graph_origin": 3 * DOWN + 6 * LEFT,
+        "x_label_direction":DOWN,
+        "y_label_direction":RIGHT,
+        "x_axis_label": None,
+        "x_axis_width":10
+    }
+
+    def construct(self):
+        self.setup_axes(animate=False) 
+        # 移动坐标轴，暂时还想不出为什么会这样移动，得研究源码才知道，先记住然后运用再说
+        self.x_axis.shift(LEFT*abs(self.y_axis[0].points[0]-self.x_axis[0].points[0]))
+        self.y_axis.shift(DOWN*abs(self.y_axis[0].points[0]-self.x_axis[0].points[0]))
+        # 对x、ylabel进行移动，这里可以看出self.x_axis[0]应该是numberline
+        self.x_axis_label_mob.next_to(self.x_axis[0].get_end(),UP)
+        self.y_axis_label_mob.next_to(self.y_axis[0].get_end(),UP)
+        p=Dot().move_to(self.coords_to_point(self.x_min, self.y_min))
+        self.add(p)
+        graph = self.get_graph(lambda x : x**2, 
+                                    color = GREEN,
+                                    x_min = 5, 
+                                    x_max = 7
+                                    )
+
+        self.play(
+            ShowCreation(graph),
+            run_time = 2
+        )
+        self.wait()
+```
+
+输出结果：**图片的xlabel是正常显示的。**
+
+<img src="./img/4.png" style="zoom:50%;" />
+
+发现不管怎么设置横纵坐标的起始值，运用这种移动方式都可以满足要求，例如下面：
+
+```python
+# 修改上面一些值
+"x_min":5,
+"x_max":8,
+"y_min":30,
+"y_max":60,
+"x_labeled_nums": list(np.arange(5, 9)),
+"y_labeled_nums":range(40,70,10),
+graph = self.get_graph(lambda x : 6*x,
+                                    color = GREEN,
+                                    x_min = 5, 
+                                    x_max = 8
+                                    )
+```
+
+输出结果：
+
+<img src="./img/5.png" alt="graph" style="zoom:50%;" />
 
