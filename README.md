@@ -24,7 +24,7 @@ class Plot1(GraphScene):
         "y_max": 10,			  # 纵坐标的最大值
         "y_axis_height": 6,		  # 纵坐标轴所占的画面高度，画面全高为6
         "y_tick_frequency": 1,	  # y轴刻度值间隔
-        "y_bottom_tick": None,    # 同上
+        "y_bottom_tick": None,    # 跟x_leftmost_tick一样
         "y_labeled_nums": None,	  # 是否显示纵坐标数字刻度
         "y_axis_label": "$y$",	  # y轴的label，一般为y
         "axes_color": GREY,		  # 坐标轴的颜色
@@ -57,6 +57,34 @@ class Plot1(GraphScene):
 
 [graph](./img/1.png)
 
-以上都是`manim`默认设置的`graph`，但有时我们需要定制适合自己的坐标系。
+以上都是`manim`默认设置的`graph`，但有时我们需要**定制**适合自己的坐标系。
 
-1. 
+1. 显示坐标轴刻度值，并且间隔为2
+
+```python
+# 只需改改CONFIG中的参数即可
+"x_tick_frequency": 2,
+"x_labeled_nums": range(-1,11,2),
+"y_tick_frequency": 2,
+"y_labeled_nums": range(-1,11,2),
+```
+
+输出结果：
+
+[graph](./img/2.png)
+
+由于横纵坐标的最大值为10，而间隔为2，所以最终不会显示10的`tick`，解决方法是：要么改变`x_tick_frequency`和`y_tick_frequency`，要么改变`x_max`和`y_max`使最大值有对应的`tick`。
+
+```python
+"x_max":11,
+"y_max":11,
+"x_tick_frequency": 2,
+"x_labeled_nums": range(-1,12,2),
+"y_tick_frequency": 2,
+"y_labeled_nums": range(-1,12,2),
+```
+
+输出结果：
+
+[graph](./img/3.png)
+
