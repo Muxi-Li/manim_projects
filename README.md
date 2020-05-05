@@ -167,4 +167,96 @@ graph = self.get_graph(lambda x : 6*x,
 
 这里不知道是不是我安装的版本旧还是作者没有更新这个问题，所以我就改了了一下源代码，来满足我的需求。
 
-在改代码之前，我们首先要知道，`graph`其实就是两根`Numberline`，然后一根旋转90度得到的。
+在改代码之前，我们首先要知道，`graph`在初始化的时候，生成两个坐标轴：`x_axis`、`y_axis`，这两个其实是`Numberline`，然后y轴旋转90度就得到我们看到的坐标系。其中的刻度小数位数可以在`number_line.py`中修改：
+
+```python
+CONFIG = {
+    # ......
+    "decimal_number_config": {
+            "num_decimal_places": 0,
+        },
+    # ......
+}
+```
+
+可以看到默认的刻度值是0位小数的，我们可以在定义`Numberline`的时候引入一个数，具体的做法如下：
+
+```python
+# graph_scene.py
+# 在graph_scene.py的CONFIG配置中添加两个变量
+"x_label_decimal":0,	# 0是默认是没有小数的
+"y_label_decimal":0,
+# 在def setup_axes()中作如下修改
+x_axis = NumberLine(
+            x_min=self.x_min,
+            x_max=self.x_max,
+            unit_size=self.space_unit_to_x,
+            tick_frequency=self.x_tick_frequency,
+            leftmost_tick=self.x_leftmost_tick,
+            numbers_with_elongated_ticks=self.x_labeled_nums,
+            color=self.axes_color,
+    		# 添加了下面一行
+            decimal_number_config={"num_decimal_places": self.x_label_decimal}
+        )
+ y_axis = NumberLine(
+            x_min=self.y_min,
+            x_max=self.y_max,
+            unit_size=self.space_unit_to_y,
+            tick_frequency=self.y_tick_frequency,
+            leftmost_tick=self.y_bottom_tick,
+            numbers_with_elongated_ticks=self.y_labeled_nums,
+            color=self.axes_color,
+            line_to_number_vect=LEFT,
+            label_direction=LEFT,
+     		# 添加了下面一行
+            decimal_number_config={"num_decimal_places": self.y_label_decimal}
+        )
+```
+
+那我们在写代码的时候是怎样的的呢？
+
+```python
+class Plot1(GraphScene):
+    CONFIG = {
+        "y_max" : 50,
+        "y_min" : 0,
+        "x_max" : 7,
+        "x_min" : 0,
+        "y_tick_frequency" : 5, 
+        "x_tick_frequency" : 0.5, 
+        "axes_color" : BLUE, 
+        "y_labeled_nums": range(0,60,10),
+        "x_labeled_nums": list(np.arange(2, 7.0+0.5, 0.5)),
+        "x_label_decimal":1,	# 这里设置x轴刻度值小数位数
+        "y_label_direction": RIGHT,
+        "x_label_direction": UP,
+        "y_label_decimal":3		# 这里设置y轴刻度值小数位数
+    }
+    def construct(self):
+        self.setup_axes(animate=True)
+        graph = self.get_graph(lambda x : x**2,  
+                                    color = GREEN,
+                                    x_min = 2, 
+                                    x_max = 4
+                                    )
+        self.play(
+        	ShowCreation(graph),
+            run_time = 2
+        )
+        self.wait()
+```
+
+输出结果：
+
+<img src="./img/6.png" style="zoom:50%;" />
+
+当然，除了这种方法，还可以自定义坐标系刻度值，这也可以做到，是下面一种方法。
+
+4. **自定义坐标轴刻度值**
+
+比如有时候x轴我不想用整数或者小数，想用分数，这该怎么办呢？看下面：
+
+```python
+
+```
+
