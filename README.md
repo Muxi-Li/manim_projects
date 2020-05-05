@@ -250,13 +250,60 @@ class Plot1(GraphScene):
 
 <img src="./img/6.png" style="zoom:50%;" />
 
-当然，除了这种方法，还可以自定义坐标系刻度值，这也可以做到，是下面一种方法。
+4. **自定义setup_axes()函数**
 
-4. **自定义坐标轴刻度值**
-
-比如有时候x轴我不想用整数或者小数，想用分数，这该怎么办呢？看下面：
+   上面有关`graph`的变量赋值都是通过`CONFIG`实现的，但可以自己写一个`setup_axes()`实现这个效果。原则上说，`graph_scene.py`中`CONFIG`中定义的变量都可以在`setup_axes`中实现。
 
 ```python
+class Plot2(GraphScene):
+    CONFIG = {
+        "y_max" : 50,
+        "y_min" : 0,
+        "x_max" : 7,
+        # "x_min" : 0,	# 假设注释这个，在自己的setup_axes()中定义
+        "y_tick_frequency" : 5,
+        "axes_color" : BLUE,
+        "x_axis_label" : "$t$",
+        "y_axis_label" : "$f(t)$",
+    }
+    def construct(self):
+        self.setup_axes()	# 调用setup_axes()
+        graph = self.get_graph(lambda x : x**2, color = GREEN)
+        self.play(
+        	ShowCreation(graph),
+            run_time = 2
+        )
+        self.wait()
 
+    def setup_axes(self):
+        # 一定要加这一句，先初始坐标系，在自己更改其他的东西
+        GraphScene.setup_axes(self) 
+        # Parametters of labels
+        #   For x
+        self.x_min=-1	# 横轴最小值
+        self.x_axis.label_direction = DOWN #DOWN is default
+        self.y_axis.label_direction = RIGHT
+		# 添加坐标轴刻度值
+        self.x_axis.add_numbers(*range(
+                                        2,
+                                        7+1,
+                                        1
+                                    ))
+        self.y_axis.add_numbers(*range(
+                                        20,
+                                        50+20,
+                                        5
+                                    ))
+        # 显示生成坐标轴的动画
+        self.play(
+            ShowCreation(self.x_axis),
+            ShowCreation(self.y_axis)
+        )
 ```
+
+输出结果：
+
+<img src="./img/7.png" style="zoom:50%;" />
+
+自定义坐标轴还是挺重要的，因为有时候我们需要在同一个画面中显示两个坐标系，需要定义不同的参数。
 
