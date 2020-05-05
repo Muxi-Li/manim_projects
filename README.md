@@ -17,7 +17,8 @@ class Plot1(GraphScene):
         "x_max": 10,		# 横坐标最大值
         "x_axis_width": 9,	# 整个画面的宽度是14，可以设置x轴所占的宽度
         "x_tick_frequency": 1,	  # x轴刻度间隔
-        "x_leftmost_tick": None,  # None的话显示默认tick，设想：可不可以显示其他类型的tick？
+        "x_leftmost_tick": None,  # 从最小刻度开始绘制tick，如果不是None，则最小刻度那里没有tick
+        # 感觉可以改写源代码，让最小刻度的tick在需要的值开始
         "x_labeled_nums": None,	  # 横坐标刻度值，传入列表
         "x_axis_label": "$x$",	  # 就是横坐标的label，一般是x
         "y_min": -1,			  # 纵坐标的最小值
@@ -162,3 +163,8 @@ graph = self.get_graph(lambda x : 6*x,
 
 <img src="./img/5.png" alt="graph" style="zoom:50%;" />
 
+3. **具有小数刻度值的坐标轴**
+
+这里不知道是不是我安装的版本旧还是作者没有更新这个问题，所以我就改了了一下源代码，来满足我的需求。
+
+在改代码之前，我们首先要知道，`graph`其实就是两根`Numberline`，然后一根旋转90度得到的。
