@@ -276,7 +276,7 @@ class Plot2(GraphScene):
         self.wait()
 
     def setup_axes(self):
-        # 一定要加这一句，先初始坐标系，在自己更改其他的东西
+        # 一定要加这一句，先初始坐标系，再更改其他的东西
         GraphScene.setup_axes(self) 
         # Parametters of labels
         #   For x
@@ -306,4 +306,118 @@ class Plot2(GraphScene):
 <img src="./img/7.png" style="zoom:50%;" />
 
 自定义坐标轴还是挺重要的，因为有时候我们需要在同一个画面中显示两个坐标系，需要定义不同的参数。
+
+5. **自定义刻度值**
+
+前面的刻度值都是整数或者小数，但我们有时候不想要，比如想要分数的刻度值，咋办呢？
+
+```python
+class Plot5(GraphScene):
+    CONFIG = {
+        "y_max" : 50,
+        "y_min" : 0,
+        "x_max" : 7,
+        "x_min" : 0,
+        "y_tick_frequency" : 10,
+        "x_tick_frequency" : 0.5,
+        "axes_color" : BLUE,
+    }
+    def construct(self):
+        self.setup_axes()
+        graph = self.get_graph(lambda x : x**2, color = GREEN)
+
+        self.play(
+            ShowCreation(graph),
+            run_time = 2
+        )
+        self.wait()
+
+    def setup_axes(self):
+        GraphScene.setup_axes(self)
+        self.x_axis.label_direction = UP
+        values_x = [
+            "\\frac{1}{2}",
+            "\\frac{3}{2}",
+            "\\frac{5}{2}",
+            "\\frac{7}{2}",
+            "\\frac{9}{2}",
+            "\\frac{11}{2}",
+            "\\frac{13}{2}",
+        ]
+        self.x_axis_labels = VGroup()  # Create a group named x_axis_labels
+        for x_val,position in zip(values_x,np.arange(0.5,7,1)):
+            tex = TexMobject(x_val).scale(0.7)
+            tex.next_to(self.coords_to_point(position, 0), DOWN)
+            self.x_axis_labels.add(tex)
+        self.play(
+            Write(self.x_axis_labels),
+            Write(self.x_axis),
+            Write(self.y_axis)
+        )
+```
+
+输出结果：
+
+<img src="./img/8.png" style="zoom:50%;" />
+
+这里也可以自定义刻度值来实现**小数刻度值**的情况。
+
+```python
+class Plot7(GraphScene):
+    CONFIG = {
+        "y_max" : 50,
+        "y_min" : 0,
+        "x_max" : 7,
+        "x_min" : 0,
+        "y_tick_frequency" : 10,
+        "x_tick_frequency" : 0.5,
+        "axes_color" : BLUE,
+    }
+    def construct(self):
+        self.setup_axes()
+        graph = self.get_graph(lambda x : x**2, color = GREEN)
+
+        self.play(
+            ShowCreation(graph),
+            run_time = 2
+        )
+        self.wait()
+
+    def setup_axes(self):
+        GraphScene.setup_axes(self)
+        self.x_axis.label_direction = UP
+        # Additional parametters
+        init_val_x = 0
+        step_x = 0.5
+        end_val_x = 7
+        # Position of labels
+        values_decimal_x=Range(init_val_x,end_val_x,step_x)
+        # List of labels 注意这里
+        list_x=[*["%.1f"%i for i in values_decimal_x]]
+        # List touples of (posición,etiqueta)
+        values_x = [
+            (i,j)
+            for i,j in zip(values_decimal_x,list_x)
+        ]
+        self.x_axis_labels = VGroup()
+        for x_val, x_tex in values_x:
+            tex = TexMobject(x_tex)
+            tex.scale(0.7)
+            tex.next_to(self.coords_to_point(x_val, 0), DOWN)
+            self.x_axis_labels.add(tex)
+        self.play(
+            Write(self.x_axis_labels),
+            Write(self.x_axis),
+            Write(self.y_axis)
+        )
+
+```
+
+输出结果：
+
+<img src="./img/9.png" style="zoom:50%;" />
+
+所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
+
+6. **显示多个坐标**
 
