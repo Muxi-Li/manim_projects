@@ -582,3 +582,30 @@ class Plot7(GraphScene):
 `show_signed_area`：跟积分正负有关，`True`，区分显示负积分的矩形，`False`，不区分显示负积分的矩形。
 
 `width_scale_factor`：还不知道用处是啥，可能自己暂时用不上。
+
+* `get_area(self, graph, t_min, t_max)`
+
+> 功能
+
+求面积积分。相当于前面的`get_riemann_rectangles()`当`dx`很小的情况。
+
+> parameters
+
+`graph`：已经生成的函数图像。
+
+`t_min`：面积积分横坐标开始位置。
+
+`t_max`：面积积分横坐标结束位置。
+
+* `transform_between_riemann_rects(self, curr_rects, new_rects, **kwargs)`
+
+> 功能
+
+将两个`get_riemann_rectangles`矩形`transform`变换。
+
+> parameters
+
+`curr_rects`：旧的矩形。
+
+`new_rects`：新的矩形。
+
