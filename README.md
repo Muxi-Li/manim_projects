@@ -4,6 +4,8 @@
 
 本着遇到各种坑再寻找解决方法的原则，总结了我遇到了各种坑的解决方法，可能有些方法并不是很好。
 
+---
+
 ## 问题一：坐标系的设置
 
 我们要显示函数图像，首先要设置坐标轴，才能让函数图像在坐标轴上显示出来。
@@ -419,7 +421,9 @@ class Plot7(GraphScene):
 
 所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
 
-#### 6.函数
+---
+
+## 问题一补充：`GraphScene`的一些相关函数
 
 这里再补充一下`graphScene`类的一些函数。
 
@@ -433,6 +437,8 @@ class Plot7(GraphScene):
 
 `animate`: `True`表示显示生成坐标轴动画，`False`则表示不显示，直接出现画好的坐标轴。
 
+
+
 * `coords_to_point(self, x, y)`
 
 > 功能
@@ -444,6 +450,8 @@ class Plot7(GraphScene):
 `x`：横坐标。
 
 `y`：纵坐标
+
+
 
 * `point_to_coords(self, point)`
 
@@ -458,6 +466,8 @@ class Plot7(GraphScene):
 > return
 
 `[x,y]`
+
+
 
 * `input_to_graph_point(self, x, graph)`
 
@@ -475,6 +485,8 @@ class Plot7(GraphScene):
 
 `point`
 
+
+
 * `angle_of_tangent(self, x, graph, dx=0.01)`
 
 > 功能
@@ -489,6 +501,8 @@ class Plot7(GraphScene):
 
 `dx=0.01`：计算斜率肯定需要两个点，这是两个点的横坐标间隔，默认为0.01。
 
+
+
 * `slope_of_tangent(self, *args, **kwargs)`
 
 > 功能
@@ -497,7 +511,9 @@ class Plot7(GraphScene):
 
 > parameters
 
-跟`angle_of_tangent`传一样的参数即可。***这里可以跟`update`实现斜率变化的效果。***
+跟`angle_of_tangent`传一样的参数即可。
+
+
 
 * `get_derivative_graph(self, graph, dx=0.01, **kwargs)`
 
@@ -510,3 +526,59 @@ class Plot7(GraphScene):
 `graph`：已经生成的graph。
 
 `dx`：微小量。
+
+
+
+* `get_graph_label(self,graph,label="f(x)",x_val=None,direction=RIGHT,buff=MED_SMALL_BUFF,color=None)`
+
+> 功能
+
+返回函数图像添加`label`，默认是`f(x)`。
+
+> parameters
+
+`graph`：已经生成的函数图像。
+
+`label`：函数标签，默认是`f(x)`。
+
+`x_val`：添加`label`的横坐标。
+
+`direction`：方向。
+
+`buff`：距离。
+
+`color`：标签的颜色。
+
+
+
+* `get_riemann_rectangles(self,graph,x_min=None,x_max=None,dx=0.1,input_sample_type="left",stroke_width=1,stroke_color=BLACK,fill_opacity=1,start_color=None,end_color=None,show_signed_area=True,width_scale_factor)`
+
+> 功能
+
+返回函数图像黎曼积分的矩形，就是面积积分的矩形。
+
+> parameters
+
+`graph`：生成的函数图像。
+
+`x_min`：显示矩形的开始位置。
+
+`x_max`：显示矩形的结束位置。
+
+`dx`：其实就是矩形的宽度，当宽度越小时，积分越能近似函数图像的面积积分。
+
+`input_sample_type`：取样点，有`left`、`center`、`right`三个值，应该是求矩形高的时候有关，因为三个值对应的函数值不同，代表的矩形高也不同。
+
+`stroke_width`：矩形边的线宽。
+
+`stroke_color`：矩形线的颜色。
+
+`fill_opacity`：矩形填充的透明度。
+
+`start_color`：填充颜色的起始颜色，涉及到颜色渐变。
+
+`end_color`：填充颜色的结束颜色。
+
+`show_signed_area`：跟积分正负有关，`True`，区分显示负积分的矩形，`False`，不区分显示负积分的矩形。
+
+`width_scale_factor`：还不知道用处是啥，可能自己暂时用不上。
