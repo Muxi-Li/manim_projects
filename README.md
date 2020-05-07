@@ -609,3 +609,125 @@ class Plot7(GraphScene):
 
 `new_rects`：新的矩形。
 
+* `get_vertical_line_to_graph(self,x,graph,line_class,**line_kwargs)`
+
+> 功能
+
+获取某个横坐标对应的竖直的线。
+
+> parameters
+
+`x`：横坐标。
+
+`graph`：已经画好的函数图像。
+
+`line_class`：直线线类型，有`Line`（实线）、`Dashline`（虚线）。
+
+`line_kwargs`：其他一些直线的参数。
+
+* `get_vertical_lines_to_graph(self,graph,x_min=None,x_max=None,num_lines=20,**kwargs)`
+
+> 功能
+
+返回`(x_min,x_max)`内的所有竖直线`(VGroup)`，竖直线默认数量为20。
+
+> parameters
+
+`graph`：函数图像。
+
+`x_min`：横坐标最小值。
+
+`x_max`：横坐标最大值。
+
+`num_lines`：竖直线数量。
+
+* `get_secant_slope_group(x,graph,dx=None,dx_line_color=None,df_line_color=None,dx_label=None,df_label=None,include_secant_line=True,secant_line_color=None,secant_line_length=10)`
+
+> 功能
+
+返回一条割线，感觉很有用。
+
+> parameters
+
+`x`：一个点的横坐标。
+
+`graph`：函数图像。
+
+`dx`：画割线肯定要两个点，横坐标`x`确定第一个点，`x+dx`确定另一个点。
+
+`dx_line_color`：线的颜色，具体看图。
+
+`df_line_color`：线的颜色，具体看图。
+
+`dx_label`：具体看图。
+
+`df_label`：具体看图。
+
+`include_secant_line`：True表示显示割线，反之不显示。
+
+`secant_line_color`：割线的颜色。
+
+`secant_line_length`：割线的长度，默认长10。
+
+```python
+class MyGraph(GraphScene):
+    CONFIG = {
+        "x_min": -1,
+        "x_max": 10,
+        "x_axis_width": 9,
+        "x_tick_frequency": 1,
+        "x_leftmost_tick": 2,  # Change if different from x_min
+        "x_labeled_nums": range(-1,11),
+        "x_axis_label": "$x$",
+        "y_min": -1,
+        "y_max": 10,
+        "y_axis_height": 6,
+        "y_tick_frequency": 1,
+        "y_bottom_tick": None,  # Change if different from y_min
+        "y_labeled_nums": range(-1,11),
+        "y_axis_label": "$y$",
+        "axes_color": GREY,
+        "graph_origin": 2.5 * DOWN + 4 * LEFT,
+        "exclude_zero_label": True,
+        "default_graph_colors": [BLUE, GREEN, YELLOW],
+        "default_derivative_color": GREEN,
+        "default_input_color": YELLOW,
+        "default_riemann_start_color": BLUE,
+        "default_riemann_end_color": GREEN,
+        "area_opacity": 0.8,
+        "num_rects": 50,
+
+    }
+    def construct(self):
+        self.setup_axes(animate=True)
+        p1 = Dot().move_to(self.coords_to_point(1, 1))
+        p2 = Dot().move_to(self.coords_to_point(3, 9))
+        self.add(p1, p2)
+        graph1 = self.get_graph(
+            lambda x:x**2,
+            x_min=-1,
+            x_max=4,
+            color=BLUE,
+        )
+        self.play(ShowCreation(graph1))
+        self.wait()
+        slope_mob = self.get_secant_slope_group(
+            x=1,
+            graph=graph1,
+            dx=2,
+            dx_line_color=YELLOW,
+            df_line_color=RED,
+            dx_label="dx",
+            df_label="dy",
+            secant_line_color=PINK
+
+        )
+
+        self.play(ShowCreation(slope_mob))
+        self.wait()
+```
+
+输出结果：
+
+<img src="./img/10.png" style="zoom:50%;" />
+
