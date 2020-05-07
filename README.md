@@ -60,7 +60,7 @@ class Plot1(GraphScene):
 
 以上都是`manim`默认设置的`graph`，但有时我们需要**定制**适合自己的坐标系。这里主要展示我平时制作视频时遇到的问题。
 
-1. **显示坐标轴刻度值，并且间隔为2**
+#### **1.显示坐标轴刻度值，并且间隔为2**
 
 ```python
 # 只需改改CONFIG中的参数即可
@@ -91,7 +91,7 @@ class Plot1(GraphScene):
 
 <img src="./img/3.png" alt="graph" style="zoom:50%;" />
 
-2. **至少其中一个坐标轴的原点不是从0开始的**
+#### **2.至少其中一个坐标轴的原点不是从0开始**
 
 视频中的画面是有大小的，有时候我们只需要查看函数图像从某一个值开始的情况，比如x>20的情况，这时候画面可能并不会显示函数图像，就如上面的设置，横坐标到11就差不多到边界了。以前曾天真的scale()坐标系，真是太痛苦了。
 
@@ -163,7 +163,7 @@ graph = self.get_graph(lambda x : 6*x,
 
 <img src="./img/5.png" alt="graph" style="zoom:50%;" />
 
-3. **具有小数刻度值的坐标轴**
+#### **3.具有小数刻度值的坐标轴**
 
 这里不知道是不是我安装的版本旧还是作者没有更新这个问题，所以我就改了了一下源代码，来满足我的需求。
 
@@ -250,9 +250,9 @@ class Plot1(GraphScene):
 
 <img src="./img/6.png" style="zoom:50%;" />
 
-4. **自定义setup_axes()函数**
+#### **4.自定义setup_axes()函数**
 
-   上面有关`graph`的变量赋值都是通过`CONFIG`实现的，但可以自己写一个`setup_axes()`实现这个效果。原则上说，`graph_scene.py`中`CONFIG`中定义的变量都可以在`setup_axes`中实现。
+上面有关`graph`的变量赋值都是通过`CONFIG`实现的，但可以自己写一个`setup_axes()`实现这个效果。原则上说，`graph_scene.py`中`CONFIG`中定义的变量都可以在`setup_axes`中实现。
 
 ```python
 class Plot2(GraphScene):
@@ -307,7 +307,7 @@ class Plot2(GraphScene):
 
 自定义坐标轴还是挺重要的，因为有时候我们需要在同一个画面中显示两个坐标系，需要定义不同的参数。
 
-5. **自定义刻度值**
+#### **5.自定义刻度值**
 
 前面的刻度值都是整数或者小数，但我们有时候不想要，比如想要分数的刻度值，咋办呢？
 
@@ -419,3 +419,94 @@ class Plot7(GraphScene):
 
 所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
 
+#### 6.函数
+
+这里再补充一下`graphScene`类的一些函数。
+
+* `setup_axes(self, animate=False)`
+
+> 功能
+
+建立坐标轴。
+
+> parameters
+
+`animate`: `True`表示显示生成坐标轴动画，`False`则表示不显示，直接出现画好的坐标轴。
+
+* `coords_to_point(self, x, y)`
+
+> 功能
+
+根据坐标获取图像中的点。
+
+> parameters
+
+`x`：横坐标。
+
+`y`：纵坐标
+
+* `point_to_coords(self, point)`
+
+> 功能
+
+在图像上返回一个点的坐标
+
+> parameters
+
+`point`：函数图像上某一点。
+
+> return
+
+`[x,y]`
+
+* `input_to_graph_point(self, x, graph)`
+
+> 功能
+
+根据横坐标获取图像上的一个点。
+
+> parameters
+
+`x`：横坐标值
+
+`graph`：生成的函数图像
+
+> return
+
+`point`
+
+* `angle_of_tangent(self, x, graph, dx=0.01)`
+
+> 功能
+
+返回横坐标对应点的斜率的角度。
+
+> parameters
+
+`x`：横坐标值。
+
+`graph`：函数图像。
+
+`dx=0.01`：计算斜率肯定需要两个点，这是两个点的横坐标间隔，默认为0.01。
+
+* `slope_of_tangent(self, *args, **kwargs)`
+
+> 功能
+
+返回一个点的斜率
+
+> parameters
+
+跟`angle_of_tangent`传一样的参数即可。***这里可以跟`update`实现斜率变化的效果。***
+
+* `get_derivative_graph(self, graph, dx=0.01, **kwargs)`
+
+> 功能
+
+获取一个函数的微分图像，比如`y=x**2`，那么它的导函数就是`y=2*x`，画出这个导函数的图像。
+
+> parameters
+
+`graph`：已经生成的graph。
+
+`dx`：微小量。
