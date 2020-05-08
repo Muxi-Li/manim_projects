@@ -731,3 +731,23 @@ class MyGraph(GraphScene):
 
 <img src="./img/10.png" style="zoom:50%;" />
 
+* `animate_secant_slope_group_change()`
+
+> 功能
+
+`update`割线效果。
+
+> parameters
+
+`secant_slope_group`：前面`get_secant_slope_group`生成的割线和`label`，是一个`group`。
+
+`target_dx`：最终`dx`。
+
+`target_x`：最终的`x`。
+
+`run_time=3`：运动时长。
+
+`added_anims`：搞不懂。
+
+`**anim_kwargs`：其他一些关键字参数。
+
