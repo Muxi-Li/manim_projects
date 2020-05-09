@@ -6,7 +6,9 @@
 
 ---
 
-## 问题一：坐标系的设置
+## `GraphScene`类
+
+### 坐标轴设置问题
 
 我们要显示函数图像，首先要设置坐标轴，才能让函数图像在坐标轴上显示出来。
 
@@ -421,9 +423,7 @@ class Plot7(GraphScene):
 
 所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
 
----
-
-## 问题一补充：`GraphScene`的一些相关函数
+### `GraphScene`的一些相关函数
 
 这里再补充一下`graphScene`类的一些函数。
 
@@ -751,3 +751,110 @@ class MyGraph(GraphScene):
 
 `**anim_kwargs`：其他一些关键字参数。
 
+---
+
+## `TexMobject` &`TextMobject`
+
+对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
+
+#### 文字上色
+
+1. **分开字符**
+
+```python
+class MyFormula(Scene):
+    def construct(self):
+        tex = TexMobject("\\lim_",             # 0
+                          "{h",                 # 1
+                          "\\rightarrow","0}",  # 2
+                          "{f",                 # 3
+                          "\\left(",            # 4
+                          "x",                  # 5
+                          "+",                  # 6
+                          "h",                  # 7
+                          "\\right)",           # 8
+                          "-",                  # 9
+                          "f",                  # 10
+                          "\\left(",            # 11
+                          "h",                  # 12
+                          "\\right)",           # 13
+                          "\\over",             # 14
+                          "h}"                  # 15
+        ).scale(0.7)
+        text[0].set_color(RED)
+        text[1].set_color(BLUE)
+        text[2].set_color(GREEN)
+        text[3].set_color(YELLOW)
+        text[4].set_color(PINK)
+        text[5].set_color(ORANGE)
+        text[6].set_color(PURPLE)
+        text[7].set_color(MAROON)
+        text[8].set_color(TEAL)
+        text[9].set_color(GOLD)
+        text[10].set_color(GRAY)
+        text[11].set_color("#F8C471")
+        text[12].set_color("#D0D3D4")
+        text[13].set_color("#512E5F")
+        text[14].set_color("#273746")
+        text[15].set_color("#E6B0AA")
+        text[16].set_color("#2ECC71")
+        self.play(Write(text))
+        self.wait(2)
+```
+
+输出结果：
+
+<img src="./img/11.png" style="zoom:50%;" />
+
+这里对于有分数的上色推荐使用`\\over`而不是用`\\frac{}{}`，后者可能会出现意想不到的问题。
+
+这里可以进一步优化（**推荐**）：
+
+```python
+class MyFormula(Scene):
+    def construct(self):
+        tex = TexMobject("\\lim_",              # 0
+                          "{h",                 # 1
+                          "\\rightarrow","0}",  # 2
+                          "{f",                 # 3
+                          "\\left(",            # 4
+                          "x",                  # 5
+                          "+",                  # 6
+                          "h",                  # 7
+                          "\\right)",           # 8
+                          "-",                  # 9
+                          "f",                  # 10
+                          "\\left(",            # 11
+                          "h",                  # 12
+                          "\\right)",           # 13
+                          "\\over",             # 14
+                          "h}"                  # 15
+        ).scale(1.2)
+        color_data = [
+            RED,
+            BLUE,
+            GREEN,
+            YELLOW,
+            PINK,
+            ORANGE,
+            PURPLE,
+            MAROON,
+            TEAL,
+            GOLD,
+            GRAY,
+            "#F8C471",
+            "#D0D3D4",
+            "#512E5F",
+            "#273746",
+            "#E6B0AA",
+            "#2ECC71"
+        ]
+        for i,color in zip(range(17),color_data):
+            tex[i].set_color(color)
+        self.play(Write(tex))
+        self.wait(2)
+```
+
+输出结果：
+
+<img src="./img/12.png" style="zoom:50%;" />
