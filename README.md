@@ -753,13 +753,13 @@ class MyGraph(GraphScene):
 
 ---
 
-## `TexMobject` &`TextMobject`
+## `TexMobject` &`TextMobject`&`Text`
 
 对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
 
 #### 文字上色
 
-1. **分开字符**
+1. **`TexMobject`:  分开字符，分别上色**
 
 ```python
 class MyFormula(Scene):
@@ -815,21 +815,23 @@ class MyFormula(Scene):
     def construct(self):
         tex = TexMobject("\\lim_",              # 0
                           "{h",                 # 1
-                          "\\rightarrow","0}",  # 2
-                          "{f",                 # 3
-                          "\\left(",            # 4
-                          "x",                  # 5
-                          "+",                  # 6
-                          "h",                  # 7
-                          "\\right)",           # 8
-                          "-",                  # 9
-                          "f",                  # 10
-                          "\\left(",            # 11
-                          "h",                  # 12
-                          "\\right)",           # 13
-                          "\\over",             # 14
-                          "h}"                  # 15
+                          "\\rightarrow",		# 2
+                          "0}",  				# 3
+                          "{f",                 # 4
+                          "\\left(",            # 5
+                          "x",                  # 6
+                          "+",                  # 7
+                          "h",                  # 8
+                          "\\right)",           # 9
+                          "-",                  # 10
+                          "f",                  # 11
+                          "\\left(",            # 12
+                          "h",                  # 13
+                          "\\right)",           # 14
+                          "\\over",             # 15
+                          "h}"                  # 16
         ).scale(1.2)
+        # 这里设置color_data非常灵活，不必拘泥于此
         color_data = [
             RED,
             BLUE,
@@ -858,3 +860,88 @@ class MyFormula(Scene):
 输出结果：
 
 <img src="./img/12.png" style="zoom:50%;" />
+
+2. **`TexMobject`：使用`set_color_by_tex_to_color_map(t2c)`函数**
+
+```python
+class MyFormula(Scene):
+    CONFIG = {
+        "t2c":{
+            "\\lim_":RED,
+            "{h":BLUE,
+            "\\rightarrow":GREEN,
+            "0}":YELLOW,
+            "{f":PINK,
+            "\\left(":ORANGE,
+            "x":PURPLE,
+             "+":MAROON,
+             "h":TEAL,
+             "\\right)":GOLD,
+             "-":GRAY,
+             "f":"#F8C471",
+             "\\left(":"#D0D3D4",
+             "h":"#512E5F",
+             "\\right)":"#273746",
+             "\\over":"#E6B0AA",
+             "h}":"#2ECC71"
+
+    }
+    }
+    def construct(self):
+        tex = TexMobject("\\lim_",              # 0
+                          "{h",                 # 1
+                          "\\rightarrow",       # 2
+                          "0}",                 # 3
+                          "{f",                 # 4
+                          "\\left(",            # 5
+                          "x",                  # 6
+                          "+",                  # 7
+                          "h",                  # 8
+                          "\\right)",           # 9
+                          "-",                  # 10
+                          "f",                  # 11
+                          "\\left(",            # 12
+                          "h",                  # 13
+                          "\\right)",           # 14
+                          "\\over",             # 15
+                          "h}"                  # 16
+        ).scale(1.2)
+        tex.set_color_by_tex_to_color_map(self.t2c)
+        self.add(tex)
+```
+
+输出结果：
+
+<img src="./img/13.png" style="zoom:50%;" />
+
+显而易见，使用`t2c`字典，使相同字符有一样的颜色，有优势也有弊端。
+
+这里为什么没提到`TextMobject`呢？主要是`TextMobject`有中文的时候我非常讨厌上色，拆分很烦，就不想那么复杂，反正上色的话跟上面提到的差不多，而且还不如用`Text`。
+
+3. **`Text`:  使用set_color_by_t2c(t2c)函数**
+
+`Text`类是用来显示不同中文字体的类，个人非常喜欢，如果你的版本里的`Text`有`bug`的话，可以去`manim`的`GitHub`上看别人提交的`Pull requests`，有修复`Text`的方法。
+
+```python
+class Demo(Scene):
+    CONFIG = {
+        't2c':{
+            'a': RED,
+            'b': YELLOW,
+            'c': GREEN,
+            '你': PURPLE,
+            '好': MAROON,
+            ',': TEAL
+        }
+    }
+    def construct(self):
+        text = Text("abc,你好",font="思源黑体")
+        text.set_color_by_t2c(self.t2c)
+        self.add(text)
+```
+
+输出结果：
+
+<img src="./img/14.png" style="zoom:50%;" />
+
+对中文也这样，太棒了！！！
