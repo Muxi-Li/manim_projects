@@ -945,3 +945,66 @@ class Demo(Scene):
 <img src="./img/14.png" style="zoom:50%;" />
 
 对中文也这样，太棒了！！！
+
+#### 字体对齐  
+
+1. **next_to()**
+
+```python
+class Demo(Scene):
+    def construct(self):
+        tex1 = TexMobject("a").scale(0.8)
+        tex2 = TexMobject("ab").scale(0.8)
+        tex3 = TexMobject("abc").scale(0.8)
+        tex4 = TexMobject("abcd").scale(0.8)
+        tex5 = TexMobject("abcde").scale(0.8)
+        tex6 = TexMobject("abcdef").scale(0.8)
+        # 改变aligned_edge左对齐
+        tex1.shift(2*UP)
+        tex2.next_to(tex1,direction=DOWN,buff=0.3,aligned_edge=LEFT)
+        tex3.next_to(tex2, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        tex4.next_to(tex3, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        tex5.next_to(tex4, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        tex6.next_to(tex5, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        self.add(tex1,tex2,tex3,tex4,tex5,tex6)
+```
+
+输出结果：
+
+<img src="./img/15.png" style="zoom:50%;" />
+
+默认的情况下是中间对齐，如：上面代码不添加`aligned_edge=LEFT`，则效果如下：
+
+<img src="./img/16.png" style="zoom:50%;" />
+
+2. **arrange()**
+
+使用`VGroup()`的`arrange()`函数，这个函数的本质是`next_to()`。非常方便，个人推荐。
+
+```python
+class Demo(Scene):
+    def construct(self):
+        tex = [
+            "a",
+            "ab",
+            "abc",
+            "abcd",
+            "abcde",
+            "abcdef"
+        ]
+        tex_mob = VGroup(
+            *[TexMobject(mob).scale(0.8) for mob in tex]
+        )
+        tex_mob.arrange(
+            direction=DOWN,		# next_to()	的direction形参
+            aligned_edge=LEFT,	# 左对齐
+            buff=0.3
+        )
+        self.add(tex_mob)
+```
+
+输出结果：
+
+<img src="./img/17.png" style="zoom:50%;" />
+
+还可以有第三种方法，那就是`latex`语法对齐，但我还没系统的学`latex`，所以就不写了，也少用。
