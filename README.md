@@ -2,7 +2,7 @@
 
 ## 写在前面
 
-本着遇到各种坑再寻找解决方法的原则，总结了我遇到了各种坑的解决方法，可能有些方法并不是很好。
+本着遇到各种坑再寻找解决方法的原则，总结了我遇到了各种坑的解决方法，可能有些方法并不是很好。这些方法有很多是总结其他作者的，后面会一一列出。
 
 ---
 
@@ -1008,3 +1008,120 @@ class Demo(Scene):
 <img src="./img/17.png" style="zoom:50%;" />
 
 还可以有第三种方法，那就是`latex`语法对齐，但我还没系统的学`latex`，所以就不写了，也少用。
+
+---
+
+## `update()`函数
+
+### 一般用法
+
+```python
+class AddUpdater1(Scene):
+    def construct(self):
+        dot = Dot()
+        text = TextMobject("Label")\
+               .next_to(dot,RIGHT,buff=SMALL_BUFF)
+
+        self.add(dot,text)
+
+        # Update function
+        def update_text(obj):
+            obj.next_to(dot,RIGHT,buff=SMALL_BUFF)
+
+        # Add update function to the objects
+        text.add_updater(update_text)
+
+        # Add the object again
+        self.add(text)
+
+        self.play(dot.shift,UP*2)
+
+        # Remove update function
+        text.remove_updater(update_text)
+
+        self.wait()
+```
+
+输出结果：
+
+![](./video/2.gif)
+
+使用` text.add_updater(update_text)`将`label`与点绑定在一起，一起运动。
+
+### 使用`dt`参数
+
+```python
+class UpdateDemo1(GraphScene):
+    CONFIG = {
+        "t_offset": -3,
+        "x_max": 3,
+        "x_min": -3,
+        "y_min": -9,
+        "y_max": 9,
+        "x_tick_frequency": 1,
+        "y_tick_frequency": 1,
+        "axes_color": "BLUE",
+        "graph_origin": ORIGIN
+
+    }
+    def construct(self):
+
+        # 创建一个坐标系
+        self.setup_axes(animate=False)
+        graph = self.get_graph(self.func, x_min=-3, x_max=3, color=RED)
+        self.play(ShowCreation(graph))
+        self.wait()
+        # 创建一个点，点在图像上移动
+        dot = Dot().move_to(self.coords_to_point(-3, self.func(-3)))
+        self.add(dot)
+        self.wait()
+        def update_dot(mob, dt):
+            # dt就是帧速率，一帧等于多少秒
+            rate = 0.5*dt	# 设置速度
+            mob.move_to(self.coords_to_point(self.t_offset +
+                                             rate, self.func(self.t_offset+rate)))
+            # self.t_offset是起始值
+            self.t_offset += rate
+        dot.add_updater(update_dot)
+
+        # 创建两条虚线,随着dot移动
+        line1 = DashedLine(start=self.coords_to_point(-3, 0),
+                           end=self.coords_to_point(-3, self.func(-3)))
+        line2 = DashedLine(start=self.coords_to_point(-3, self.func(-3)),
+                           end=self.coords_to_point(0, self.func(-3)))
+        self.add(line1, line2)
+
+        def update_line1(mob):
+            l = DashedLine(
+                start=self.coords_to_point(self.t_offset, 0), 											end=self.coords_to_point(
+                self.t_offset, self.func(self.t_offset))
+            )
+            mob.become(l)
+
+        def update_line2(mob):
+            l = DashedLine(
+                start=self.coords_to_point(self.t_offset, self.func(
+                self.t_offset)), 
+                end=self.coords_to_point(0, self.func(self.t_offset)))
+            mob.become(l)
+        line1.add_updater(update_line1)
+        line2.add_updater(update_line2)
+		# 一定要加下面这句
+        self.add(dot, line1, line2)
+        self.wait(12)	# 这里控制运动时间
+        dot.remove_updater(update_dot)
+        # 去掉关联
+        line1.remove_updater(update_line1)
+        line2.remove_updater(update_line2)
+
+    def func(self, x):
+        return x**2
+```
+
+
+
+
+
+<img src="./video/1.gif" style="zoom: 80%;" />
+
+按照我的理解就是：点是父级，两条虚线是子集，点的坐标通过`dt`参数实现每前进一帧时改变它的坐标，从而达到运动效果，两条虚线通过`become()`函数实现不断的刷新，与点的位置相关联。
