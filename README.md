@@ -1125,3 +1125,63 @@ class UpdateDemo1(GraphScene):
 <img src="./video/1.gif" style="zoom: 80%;" />
 
 按照我的理解就是：点是父级，两条虚线是子集，点的坐标通过`dt`参数实现每前进一帧时改变它的坐标，从而达到运动效果，两条虚线通过`become()`函数实现不断的刷新，与点的位置相关联。
+
+### 使用`ValueTracker`
+
+```python
+class Wheel(MovingCameraScene,GraphScene):
+    def construct(self):
+        self.camera.frame.move_to(2 * RIGHT)
+        r = 1
+        o = Dot(radius=0.07,color=GREEN).shift(UP)
+        p = Dot(radius=0.07,color=RED)
+        q = p.deepcopy()
+        w = p.deepcopy()
+        c = Circle(arc_center=o.get_center(),radius=r,color=BLUE)
+        arrow = Arrow(o.get_center(),p.get_center(),buff=0,color=YELLOW)
+        l = Line(p,w,color="#99CC33")
+        theta = ValueTracker(0)
+        def get_o(theta):
+            return (theta*r*RIGHT+UP)
+        o.add_updater(
+            lambda o:o.move_to(get_o(theta.get_value()))
+        )
+        c.add_updater(
+            lambda c:c.move_to(o.get_center())
+        )
+        def get_p(theta):
+            return (RIGHT*r*(theta-np.sin(theta))+UP*r*(1-np.cos(theta)))
+        p.add_updater(
+            lambda p:p.move_to(get_p(theta.get_value()))
+        )
+        def get_w(theta):
+            return (theta * r * RIGHT)
+        w.add_updater(
+            lambda d:d.move_to(get_w(theta.get_value()))
+        )
+        arrow.add_updater(
+            lambda mob:mob.become(
+                Arrow(
+                    o.get_center(),
+                    p.get_center(),
+                    buff=0,
+                    color=YELLOW
+                )
+            )
+        )
+        l.add_updater(
+            lambda l:l.become(
+                Line(q.get_center(),w.get_center(),color="#99CC33")
+            )
+        )
+        self.add(o,p,c,arrow,l,q,w)
+        self.wait()
+        self.play(
+            theta.increment_value,2*PI,
+            run_time=8
+        )
+```
+
+输出结果：
+
+![](./video/3.gif)
