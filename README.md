@@ -4,7 +4,9 @@
 
 本着遇到各种坑再寻找解决方法的原则，总结了我遇到了各种坑的解决方法，可能有些方法并不是很好。这些方法有很多是总结其他作者的，后面会一一列出。
 
----
+[GraphScene类](#graphscene类)
+
+[TexMobject&TextMobject&Text](#textmobject&textmobject&text)
 
 ## `GraphScene`类
 
@@ -36,12 +38,12 @@ class Plot1(GraphScene):
         "graph_origin": 2.5 * DOWN + 4 * LEFT,			# 原点的位置，注意是绝对坐标
         "exclude_zero_label": True,						# 是否显示原点的label
         "default_graph_colors": [BLUE, GREEN, YELLOW],	# 图像颜色
-        "default_derivative_color": GREEN,				# 这是啥？
-        "default_input_color": YELLOW,					# 这也是啥？
-        "default_riemann_start_color": BLUE,			# 这是啥？
-        "default_riemann_end_color": GREEN,				# 黎曼是啥？
+        "default_derivative_color": GREEN,				
+        "default_input_color": YELLOW,					
+        "default_riemann_start_color": BLUE,			
+        "default_riemann_end_color": GREEN,				
         "area_opacity": 0.8,							# 在显示面积积分的时候显示的颜色透明度
-        "num_rects": 50,								# 这是啥？
+        "num_rects": 50,								
         
     }
     def construct(self):
