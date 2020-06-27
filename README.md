@@ -6,7 +6,7 @@
 
 [GraphScene类](#graphscene类)
 
-[TexMobject&TextMobject&Text](#textmobject&textmobject&text)
+[TexMobject TextMobject Text](#textmobject-textmobject-text)
 
 ## `GraphScene`类
 
@@ -755,7 +755,7 @@ class MyGraph(GraphScene):
 
 ---
 
-## `TexMobject` &`TextMobject`&`Text`
+## `TexMobject`  `TextMobject` `Text`
 
 对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
 
