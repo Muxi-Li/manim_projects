@@ -9,7 +9,7 @@
     * 小数刻度值
   * GraphScene的相关函数
 
-* [TexMobject TextMobject Text](#texmobject textmobject text)
+* [TexMobject TextMobject Text](#texmobjecttextmobjecttext)
 
 ## 前言
 
