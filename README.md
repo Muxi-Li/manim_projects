@@ -7,7 +7,7 @@
     * 间隔为2的坐标轴刻度值
     * 原点非0的刻度值
     * 小数刻度值
-  * GraphScene的相关函数
+  * `GraphScene`的相关函数
 
 * [文字类](#文字类)
   * 文字上色
@@ -15,8 +15,9 @@
   * 自定义字体
 * [update()函数](#updater)
   * 一般用法
-  * dt参数
-  * ValueTracker
+  * `dt`参数
+  * `ValueTracker`
+* [Camera类](#Camera类)
 
 ## 前言
 
@@ -1205,3 +1206,69 @@ class Wheel(MovingCameraScene,GraphScene):
 ![](./video/3.gif)
 
 [回到目录](#目录)
+
+---
+
+## `Camera`类
+
+### 配置
+
+```python
+CONFIG = {
+        "background_image": None,	# 图片背景，可以用绝对路径
+        "pixel_height": DEFAULT_PIXEL_HEIGHT,	# 像素高度，默认1440
+        "pixel_width": DEFAULT_PIXEL_WIDTH,		# 像素宽度，默认2560
+        "frame_rate": DEFAULT_FRAME_RATE,		# 帧速率
+        # Note: frame height and width will be resized to match
+        # the pixel aspect ratio
+        "frame_height": FRAME_HEIGHT,	# 画面高度
+        "frame_width": FRAME_WIDTH,		# 画面宽度
+        "frame_center": ORIGIN,			# 镜头焦点
+        "background_color": BLACK,		# 背景颜色
+        "background_opacity": 1,		# 背景不透明度
+        # Points in vectorized mobjects with norm greater
+        # than this value will be rescaled.
+        "max_allowable_norm": FRAME_WIDTH,
+        "image_mode": "RGBA",
+        "n_channels": 4,
+        "pixel_array_dtype": 'uint8',
+        # z_buff_func is only used if the flag above is set to True.
+        # round z coordinate to nearest hundredth when comparring
+        "z_buff_func": lambda m: np.round(m.get_center()[2], 2),
+        "cairo_line_width_multiple": 0.01,
+        "open_plot_depth":True,
+    }
+```
+
+在`CONFIG`中配置摄像头:
+
+```python
+class CameraTest(Scene):
+    CONFIG = {
+        "camera_config":{
+            "background_image":r"C:\Users\MuxiLi\Pictures\Saved Pictures\阳菜 (2).jpg"
+        }
+    }
+    def construct(self):
+        tex = TexMobject("hello")
+        self.add(tex)
+```
+
+输出结果：其他的属性也可以这样配置。
+
+<img src="./img/18.png" style="zoom:50%;" />
+
+### 放大镜头
+
+
+
+### 移动摄像头
+
+
+
+### 多个镜头
+
+
+
+### 相关函数
+
