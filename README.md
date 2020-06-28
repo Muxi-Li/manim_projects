@@ -13,7 +13,7 @@
   * 文字上色
   * 字体对齐
   * 自定义字体
-* [update()函数](#update()函数)
+* [update()函数](#updater)
   * 一般用法
   * dt参数
   * ValueTracker
@@ -1025,7 +1025,7 @@ class Demo(Scene):
 
 ---
 
-## `update()`函数
+## `updater`
 
 ### 一般用法
 
