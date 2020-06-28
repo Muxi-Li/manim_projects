@@ -765,6 +765,8 @@ class MyGraph(GraphScene):
 
 `**anim_kwargs`：其他一些关键字参数。
 
+[回到目录](#目录)
+
 ---
 
 ## 文字类
@@ -1023,6 +1025,8 @@ class Demo(Scene):
 
 还可以有第三种方法，那就是`latex`语法对齐，但我还没系统的学`latex`，所以就不写了，也少用。
 
+[回到目录](#目录)
+
 ---
 
 ## `updater`
@@ -1199,3 +1203,5 @@ class Wheel(MovingCameraScene,GraphScene):
 输出结果：
 
 ![](./video/3.gif)
+
+[回到目录](#目录)
