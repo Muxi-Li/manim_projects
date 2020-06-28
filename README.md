@@ -9,7 +9,7 @@
     * 小数刻度值
   * GraphScene的相关函数
 
-* [TexMobject TextMobject Text](#texmobjecttextmobjecttext)
+* [TexMobject TextMobject Text](#texmobject&textmobject&text)
 
 ## 前言
 
@@ -760,7 +760,7 @@ class MyGraph(GraphScene):
 
 ---
 
-## `TexMobject`  `TextMobject` `Text`
+## `TexMobject` &`TextMobject` &`Text`
 
 对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
 
