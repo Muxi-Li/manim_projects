@@ -1,16 +1,16 @@
 # MyAnimationWithManim
 
+[TOC]
+
 ## 写在前面
+
+1
 
 本着遇到各种坑再寻找解决方法的原则，总结了我遇到了各种坑的解决方法，可能有些方法并不是很好。这些方法有很多是总结其他作者的，后面会一一列出。
 
-[GraphScene类](#graphscene类)
-
-[TexMobject TextMobject Text](#textmobject-textmobject-text)
-
 ## `GraphScene`类
 
-### 坐标轴设置问题
+### 坐标轴设置
 
 我们要显示函数图像，首先要设置坐标轴，才能让函数图像在坐标轴上显示出来。
 
@@ -66,7 +66,7 @@ class Plot1(GraphScene):
 
 以上都是`manim`默认设置的`graph`，但有时我们需要**定制**适合自己的坐标系。这里主要展示我平时制作视频时遇到的问题。
 
-#### **1.显示坐标轴刻度值，并且间隔为2**
+#### **1.显示间隔为2的坐标轴刻度值**
 
 ```python
 # 只需改改CONFIG中的参数即可
@@ -97,7 +97,7 @@ class Plot1(GraphScene):
 
 <img src="./img/3.png" alt="graph" style="zoom:50%;" />
 
-#### **2.至少其中一个坐标轴的原点不是从0开始**
+#### **2.显示不是从0开始的坐标轴原点**
 
 视频中的画面是有大小的，有时候我们只需要查看函数图像从某一个值开始的情况，比如x>20的情况，这时候画面可能并不会显示函数图像，就如上面的设置，横坐标到11就差不多到边界了。以前曾天真的scale()坐标系，真是太痛苦了。
 
@@ -169,7 +169,7 @@ graph = self.get_graph(lambda x : 6*x,
 
 <img src="./img/5.png" alt="graph" style="zoom:50%;" />
 
-#### **3.具有小数刻度值的坐标轴**
+#### **3.显示小数刻度值的坐标轴**
 
 这里不知道是不是我安装的版本旧还是作者没有更新这个问题，所以我就改了了一下源代码，来满足我的需求。
 
@@ -256,7 +256,7 @@ class Plot1(GraphScene):
 
 <img src="./img/6.png" style="zoom:50%;" />
 
-#### **4.自定义setup_axes()函数**
+#### **4.setup_axes()函数**
 
 上面有关`graph`的变量赋值都是通过`CONFIG`实现的，但可以自己写一个`setup_axes()`实现这个效果。原则上说，`graph_scene.py`中`CONFIG`中定义的变量都可以在`setup_axes`中实现。
 
@@ -313,9 +313,7 @@ class Plot2(GraphScene):
 
 自定义坐标轴还是挺重要的，因为有时候我们需要在同一个画面中显示两个坐标系，需要定义不同的参数。
 
-#### **5.自定义刻度值**
-
-前面的刻度值都是整数或者小数，但我们有时候不想要，比如想要分数的刻度值，咋办呢？
+利用`setup_axes()`可以自定义刻度值：
 
 ```python
 class Plot5(GraphScene):
@@ -425,7 +423,7 @@ class Plot7(GraphScene):
 
 所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
 
-### `GraphScene`的一些相关函数
+### `GraphScene`的相关函数
 
 这里再补充一下`graphScene`类的一些函数。
 
