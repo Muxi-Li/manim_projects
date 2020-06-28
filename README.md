@@ -9,7 +9,14 @@
     * 小数刻度值
   * GraphScene的相关函数
 
-* [TexMobject TextMobject Text](#texmobject&textmobject&text)
+* [文字类](#文字类)
+  * 文字上色
+  * 字体对齐
+  * 自定义字体
+* [update()函数](#update()函数)
+  * 一般用法
+  * dt参数
+  * ValueTracker
 
 ## 前言
 
@@ -760,7 +767,7 @@ class MyGraph(GraphScene):
 
 ---
 
-## `TexMobject` &`TextMobject` &`Text`
+## 文字类
 
 对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
 
@@ -1055,7 +1062,7 @@ class AddUpdater1(Scene):
 
 使用` text.add_updater(update_text)`将`label`与点绑定在一起，一起运动。
 
-### 使用`dt`参数
+### `dt`参数
 
 ```python
 class UpdateDemo1(GraphScene):
@@ -1133,7 +1140,7 @@ class UpdateDemo1(GraphScene):
 
 按照我的理解就是：点是父级，两条虚线是子集，点的坐标通过`dt`参数实现每前进一帧时改变它的坐标，从而达到运动效果，两条虚线通过`become()`函数实现不断的刷新，与点的位置相关联。
 
-### 使用`ValueTracker`
+### `ValueTracker`
 
 ```python
 class Wheel(MovingCameraScene,GraphScene):
