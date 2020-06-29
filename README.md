@@ -1260,7 +1260,23 @@ class CameraTest(Scene):
 
 ### 放大镜头
 
+```python
+class CameraTest(MovingCameraScene):
+    def construct(self):
+        tex = TexMobject("hello")
+        self.play(Write(tex))
+        self.wait()
+        self.play(
+            self.camera.frame.scale,0.5,
+            run_time=2
+        )
+```
 
+输出结果：
+
+![](./video/4.gif)
+
+可以实现将一些细节放大的效果。
 
 ### 移动摄像头
 
