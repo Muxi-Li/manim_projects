@@ -438,7 +438,7 @@ class Plot7(GraphScene):
 
 所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
 
-### `GraphScene`的相关函数
+### 部分相关函数
 
 这里再补充一下`graphScene`类的一些函数。
 
@@ -451,8 +451,6 @@ class Plot7(GraphScene):
 > parameters
 
 `animate`: `True`表示显示生成坐标轴动画，`False`则表示不显示，直接出现画好的坐标轴。
-
-
 
 * `coords_to_point(self, x, y)`
 
@@ -1147,6 +1145,8 @@ class UpdateDemo1(GraphScene):
 
 ### `ValueTracker`
 
+我的理解就是一个跟踪者，时刻记录某个值得变化，并将这种变化反映到某个物体上。
+
 ```python
 class Wheel(MovingCameraScene,GraphScene):
     def construct(self):
@@ -1211,6 +1211,8 @@ class Wheel(MovingCameraScene,GraphScene):
 
 ## `Camera`类
 
+这里强条一下，不同的摄像机对应不同场景，`Camera`类适用于普通的2D场景`Scene`，其下有几个子类，比如`MovingCamera`、`MultiCamera`、`ThreeDCamera`等，分别对应`MovingCameraScene`、`ZoomedScene`、`ThreeDScene`。
+
 ### 配置
 
 ```python
@@ -1258,7 +1260,95 @@ class CameraTest(Scene):
 
 <img src="./img/18.png" style="zoom:50%;" />
 
+### 部分相关函数
+
+* `reset_pixel_shape(self, new_height, new_width)`
+
+> 功能
+
+重新设置一个像素的大小。
+
+> parameters
+
+`new_height`：新设置的像素高度。
+
+`new_width`：新设置的像素的宽度。
+
+* `get_pixel_height(self)`
+
+> 功能
+
+获取当前场景像素的高度。
+
+* `get_pixel_width(self)`
+
+> 功能
+
+获取当前场景像素的宽度。
+
+* `get_frame_height(self)`
+
+> 功能
+
+获取当前画面高度。
+
+* `get_frame_width(self)`
+
+> 功能
+
+获取当前画面的宽度，和上面一起获得当前分辨率。
+
+* `get_frame_center(self)`
+
+> 功能
+
+获取当前镜头的焦点。
+
+* `set_frame_height(self, frame_height)`
+
+> 功能
+
+设置画面的高度。
+
+> parameters
+
+`frame_height`：画面高度。
+
+* `set_frame_width(self, frame_width)`
+
+> 功能
+
+设置画面的宽度。
+
+> parameters
+
+`frame_width`：画面宽度。
+
+* `set_frame_center(self, frame_center)`
+
+> 功能
+
+设置镜头焦点。
+
+> parameters
+
+`frame_center`：镜头焦点坐标。
+
+* `is_in_frame(self, mobject)`
+
+> 功能
+
+判断物体`mobject`是否在画面中。
+
+~~算了，后面的函数看不懂。~~
+
+---
+
+## `MovingCamera`类
+
 ### 放大镜头
+
+这里其实是调用`Camera`类的子类`MovingCamera`类。如果这里详细了解`manim`类的结构，会比较清晰的理解。
 
 ```python
 class CameraTest(MovingCameraScene):
@@ -1279,10 +1369,6 @@ class CameraTest(MovingCameraScene):
 可以实现将一些细节放大的效果。
 
 ### 移动摄像头
-
-
-
-### 多个镜头
 
 
 
