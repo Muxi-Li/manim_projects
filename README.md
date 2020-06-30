@@ -1296,7 +1296,7 @@ class CameraTest(Scene):
 
 > 功能
 
-获取当前画面的宽度，和上面一起获得当前分辨率。
+获取当前画面的宽度。
 
 * `get_frame_center(self)`
 
