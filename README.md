@@ -1,14 +1,12 @@
 ## 目录
 
 * [前言](#前言)
-
 * [GraphScene类](#GraphScene类)
   * 坐标轴设置
     * 间隔为2的坐标轴刻度值
     * 原点非0的刻度值
     * 小数刻度值
   * `GraphScene`的相关函数
-
 * [文字类](#文字类)
   * 文字上色
   * 字体对齐
@@ -18,6 +16,12 @@
   * `dt`参数
   * `ValueTracker`
 * [Camera类](#Camera类)
+  * 配置
+  * 部分相关函数
+* [MovingCamera类](#MovingCamera类)
+  * 放大镜头
+  * 移动镜头
+  * 部分相关函数
 
 ## 前言
 
@@ -1364,13 +1368,33 @@ class CameraTest(MovingCameraScene):
 
 输出结果：
 
-![](./video/4.gif)
+![gif](./video/4.gif)
 
 可以实现将一些细节放大的效果。
 
-### 移动摄像头
+### 移动镜头
 
+```python
+class CameraTest(MovingCameraScene):
+    def construct(self):
+        h = TexMobject("hello").scale(1.3)
+        w = TexMobject("word").scale(1.3)\
+                              .shift(8*RIGHT)
+        self.play(Write(h))
+        self.wait()
+        self.camera.frame.save_state()	# 存储镜头原始焦点
+        self.play(
+            self.camera.frame.shift,8*RIGHT,
+            run_time=2
+        )
+        self.play(Write(w))
+        self.wait()
+        self.play(Restore(self.camera.frame))	# 初始化镜头焦点
+```
 
+输出结果：~~world打错了~~
 
-### 相关函数
+![](./video/5.gif)
+
+### 部分相关函数
 
