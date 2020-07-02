@@ -22,6 +22,7 @@
   * 放大镜头
   * 移动镜头
   * 部分相关函数
+* [MultiCamera类](#MultiCamera类)
 
 ## 前言
 
@@ -1346,9 +1347,11 @@ class CameraTest(Scene):
 
 ~~算了，后面的函数看不懂。~~
 
+[返回目录](#目录)
+
 ---
 
-## `MovingCamera`类
+## `MovingCameraScene`类
 
 ### 放大镜头
 
@@ -1396,5 +1399,53 @@ class CameraTest(MovingCameraScene):
 
 ![](./video/5.gif)
 
+[返回目录](#目录)
+
+---
+
+## `ZoomedScene`类
+
+### 配置
+
+```python
+CONFIG = {
+        "camera_class": MultiCamera,# 摄像头类型
+        "zoomed_display_height": 3,	# 摄像头高度
+        "zoomed_display_width": 3,	# 摄像头宽度
+        "zoomed_display_center": None,	# 摄像头中心坐标
+    	# 展示区域的位置，类似to_corner(UR)
+    	# 如果"zoomed_display_center"为None，则frame.to_corner(zoomed_display_corner)
+        "zoomed_display_corner": UP + RIGHT,	
+        "zoomed_display_corner_buff": DEFAULT_MOBJECT_TO_EDGE_BUFFER,	# 距离边界的距离
+        "zoomed_camera_config": {
+            "default_frame_stroke_width": 2,# frame是一个矩形区域，这里设置一个线宽
+            "background_opacity": 1,	# 设置区域不透明度
+        },
+        "zoomed_camera_image_mobject_config": {},	# ImageMobjectFromCamera类的配置
+    	# 默认镜头对准位置，这个镜头获取画面后，在一个区域展示出来。
+        "zoomed_camera_frame_starting_position": ORIGIN,
+    	# 画面缩放因子，比如上面设置展示区域为3*3，缩放因子为0.15，那么镜头区域为0.45*0.45
+        "zoom_factor": 0.15,
+        "image_frame_stroke_width": 3,	# 应该是画面也有个类似线宽的东西
+        "zoom_activated": False,	# True表示显示展示区域出现的动画效果
+    }
+```
+
+
+
+
+
+### 多镜头
+
+
+
+### 跟踪镜头
+
+
+
 ### 部分相关函数
+
+
+
+
 
