@@ -18,11 +18,11 @@
 * [Camera类](#Camera类)
   * 配置
   * 部分相关函数
-* [MovingCamera类](#MovingCamera类)
+* [MovingCameraScene类](#MovingCameraScene类)
   * 放大镜头
   * 移动镜头
   * 部分相关函数
-* [MultiCamera类](#MultiCamera类)
+* [ZoomedScene类](#ZoomedScene类)
 
 ## 前言
 
@@ -1216,8 +1216,6 @@ class Wheel(MovingCameraScene,GraphScene):
 
 ## `Camera`类
 
-这里强条一下，不同的摄像机对应不同场景，`Camera`类适用于普通的2D场景`Scene`，其下有几个子类，比如`MovingCamera`、`MultiCamera`、`ThreeDCamera`等，分别对应`MovingCameraScene`、`ZoomedScene`、`ThreeDScene`。
-
 ### 配置
 
 ```python
@@ -1405,39 +1403,86 @@ class CameraTest(MovingCameraScene):
 
 ## `ZoomedScene`类
 
+怎么理解`ZoomedScene`中的摄像头？
+
+结合实际理解，我们拿摄像机拍摄，要展示给别人看，可以通过投屏到荧幕上。同理，在`ZoomedScene`中是一个画面，摄像头`zoomed_camera`拍摄到画面中的某个部分，然后通过“荧幕”`zoomed_display`展示出来。那么接下来就是对`zoomed_camera`和`zoomed_display`两个部分的设置。
+
 ### 配置
 
 ```python
 CONFIG = {
         "camera_class": MultiCamera,# 摄像头类型
-        "zoomed_display_height": 3,	# 摄像头高度
-        "zoomed_display_width": 3,	# 摄像头宽度
-        "zoomed_display_center": None,	# 摄像头中心坐标
-    	# 展示区域的位置，类似to_corner(UR)
-    	# 如果"zoomed_display_center"为None，则frame.to_corner(zoomed_display_corner)
+        "zoomed_display_height": 3,	# 荧幕高度
+        "zoomed_display_width": 3,	# 荧幕宽度
+        "zoomed_display_center": None,	# 荧幕位置
         "zoomed_display_corner": UP + RIGHT,	
         "zoomed_display_corner_buff": DEFAULT_MOBJECT_TO_EDGE_BUFFER,	# 距离边界的距离
         "zoomed_camera_config": {
-            "default_frame_stroke_width": 2,# frame是一个矩形区域，这里设置一个线宽
-            "background_opacity": 1,	# 设置区域不透明度
+            "default_frame_stroke_width": 2,# 矩形镜头区域的线宽
+            "background_opacity": 1,	# 影响的是荧幕的透明度，莫名其妙
         },
-        "zoomed_camera_image_mobject_config": {},	# ImageMobjectFromCamera类的配置
-    	# 默认镜头对准位置，这个镜头获取画面后，在一个区域展示出来。
+    	# ImageMobjectFromCamera类的配置,默认就好了
+        "zoomed_camera_image_mobject_config": {},
+    	# 默认镜头焦点位置
         "zoomed_camera_frame_starting_position": ORIGIN,
-    	# 画面缩放因子，比如上面设置展示区域为3*3，缩放因子为0.15，那么镜头区域为0.45*0.45
         "zoom_factor": 0.15,
-        "image_frame_stroke_width": 3,	# 应该是画面也有个类似线宽的东西
+        "image_frame_stroke_width": 3,	# 荧幕线宽
         "zoom_activated": False,	# True表示显示展示区域出现的动画效果
     }
 ```
 
+**强调：**
 
+* `zoomed_display_center`和`zoomed_display_corner`控制荧幕的位置。如果`zoomed_display_center`有设置，荧幕去往设定位置，如果`zoomed_display_center`不设置，荧幕在角落那里。
 
+```python
+if self.zoomed_display_center is not None:
+    zoomed_display.move_to(self.zoomed_display_center)
+else:
+    zoomed_display.to_corner(
+     	self.zoomed_display_corner,
+        buff=self.zoomed_display_corner_buff
+    )
+```
 
+* `zoom_factor`为缩放因子（假设设置为0.3），比如荧幕展示区域为3* 3，那么镜头矩形区域为0.9* 0.9，这不是按面积放大来算的。
 
-### 多镜头
+* 要控制荧幕矩形区域的线宽，`image_frame_stroke_width`好像没有用，因为整个类没有调用它的地方，估计是3b1b忘了把这个参数传进函数中了，不过可以通过`zoomed_camera_image_mobject_config`中设置线宽，然后巴拉巴拉的，我修改了一点点源代码实现了控制荧幕的线宽的效果，无非就是传参接参的问题。~~不过为什么那么麻烦呢，摄像机和荧幕的默认3的线宽不好吗？~~
 
+### 局部放大镜头
 
+```python
+class CameraTest(ZoomedScene):
+    CONFIG = {
+        "zoom_factor": 0.3,
+        "zoomed_display_height": 3,
+        "zoomed_display_width": 3,
+
+    }
+    def construct(self):
+        dot = Dot()
+        # ScreenGrid生成视频中的网格，跟本次内容无关，只是方便查看镜头和荧幕区域的尺寸
+        screen_grid = ScreenGrid()
+        self.add(dot,screen_grid)
+        zoomed_camera = self.zoomed_camera
+        zoomed_display = self.zoomed_display
+        frame = zoomed_camera.frame
+        zoomed_display_frame = zoomed_display.display_frame
+        frame.move_to(dot)
+        frame.set_color(PURPLE)
+        self.play(
+            ShowCreation(frame)
+        )
+        self.activate_zooming(animate=False)
+        self.play(
+            self.get_zoomed_display_pop_out_animation()
+        )
+        self.wait()
+```
+
+输出结果：
+
+![](./video/6.gif)
 
 ### 跟踪镜头
 
