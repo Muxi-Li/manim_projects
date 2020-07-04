@@ -6,6 +6,9 @@
     * 间隔为2的坐标轴刻度值
     * 原点非0的刻度值
     * 小数刻度值
+  * 函数曲线
+    * `ParametricFunction`类
+    * `FunctionGraph`类
   * `GraphScene`的相关函数
 * [文字类](#文字类)
   * 文字上色
@@ -442,6 +445,103 @@ class Plot7(GraphScene):
 <img src="./img/9.png" style="zoom:50%;" />
 
 所以自定制刻度值是非常灵活的，可以实现在坐标轴上只显示几个点的刻度值。
+
+### 函数曲线
+
+出了上面使用`graph = self.get_graph(lambda x : x**2, color = GREEN)`得到函数曲线外，还可以有两种方法。
+
+#### `ParametricFunction`类
+
+可以理解成参数方程，传入一个参数，返回一个三维向量，也就是说可以绘制三维空间上的曲线。
+
+#####  配置
+
+```python
+CONFIG = {
+        "t_min": 0,	# 默认参数最小值
+        "t_max": 1,	# 默认参数最大值
+    	# 步长
+        "step_size": 0.01,  # Use "auto" (lowercase) for automatic step size
+        # "step_size": -0.01,  # Use "auto" (lowercase) for automatic step size
+
+        "dt": 1e-8,	# 跟计算总的分段数量有关
+        # TODO, be smarter about figuring these out?
+        "discontinuities": [],
+    }
+```
+
+##### 举例
+
+```python
+class Demo(Scene):
+    CONFIG = {
+        "cos_graph_config":{
+            "t_min":-PI,
+            "t_max":PI,
+            "color":BLUE
+        }
+    }
+    def construct(self):
+        screen_grid = ScreenGrid()
+        cos_graph = ParametricFunction(
+            lambda t:np.array([t,np.cos(2*t),0]),
+            **self.cos_graph_config
+        )
+        self.add(screen_grid,cos_graph)
+```
+
+输出结果：
+
+![](./img/20.png)
+
+#### `FunctionGraph`类
+
+`FunctionGraph`类是`ParametricFunction`的子类，相当于仅在二维上的函数曲线。
+
+##### 配置
+
+```python
+CONFIG = {
+        "color": YELLOW,	# 默认曲线颜色
+    	# 默认横坐标范围为整个画面长度
+        "x_min": -FRAME_X_RADIUS,	
+        "x_max": FRAME_X_RADIUS,
+    }
+```
+
+##### 举例
+
+```python
+class Demo(Scene):
+    CONFIG = {
+        "right_graph_config":{
+            "x_min":0.01,
+            # "x_max":3,
+            "color":BLUE
+        },
+        "left_graph_config": {
+            # "x_min": -3,
+            "x_max": -0.01,
+            "color": BLUE
+        }
+
+    }
+    def construct(self):
+        screen_grid = ScreenGrid()
+        left_graph = FunctionGraph(
+            lambda t: 3/5*np.sin(5*t)/(t),
+            **self.left_graph_config
+        )
+        right_graph = FunctionGraph(
+            lambda t: 3/5*np.sin(5*t)/(t),
+            ** self.right_graph_config
+        )
+        self.add(screen_grid,left_graph,right_graph)
+```
+
+输出结果：
+
+![](./img/21.png)
 
 ### 部分相关函数
 
@@ -1464,7 +1564,9 @@ class CameraTest(ZoomedScene):
         # ScreenGrid生成视频中的网格，跟本次内容无关，只是方便查看镜头和荧幕区域的尺寸
         screen_grid = ScreenGrid()
         self.add(dot,screen_grid)
+        # 摄像机
         zoomed_camera = self.zoomed_camera
+        # 荧幕
         zoomed_display = self.zoomed_display
         frame = zoomed_camera.frame
         zoomed_display_frame = zoomed_display.display_frame
@@ -1473,6 +1575,7 @@ class CameraTest(ZoomedScene):
         self.play(
             ShowCreation(frame)
         )
+        # 这句一定要加，相当于投屏的开关
         self.activate_zooming(animate=False)
         self.play(
             self.get_zoomed_display_pop_out_animation()
@@ -1486,7 +1589,83 @@ class CameraTest(ZoomedScene):
 
 ### 跟踪镜头
 
+想实现一个三角形在某条函数曲线上移动，然后有个局部放大镜头跟着移动的效果。
 
+```python
+class ZoomedCameraMoveAlongPath(ZoomedScene):
+    CONFIG = {
+        "curve_config":{
+            "x_min":-3,
+            "x_max":3,
+            "color":PURPLE
+        },
+        "zoomed_display_height":2,
+        "zoomed_display_width":2,
+        "zoom_factor":0.3,
+        "zoomed_display_corner":DR,
+        "zoomed_camera_image_mobject_config":{
+            "stroke_color":GREEN,
+        }
+    }
+    def get_pending(self,path,proportion,dx=0.01):
+        # 获取曲线在某一点的切线的角度
+        if proportion < 1:
+            coord_i = path.point_from_proportion(proportion)
+            coord_f = path.point_from_proportion(proportion+dx)
+        else:
+            coord_i = path.point_from_proportion(proportion-dx)
+            coord_f = path.point_from_proportion(proportion)
+        line = Line(coord_i,coord_f)
+        angle = line.get_angle()
+        return angle
+    def construct(self):
+        # curve
+        curve = FunctionGraph(
+            lambda t: np.sin(3*t),
+            **self.curve_config
+        )
+        
+        # triangle
+        triangle = Triangle().set_height(0.2)
+        triangle.move_to(curve.get_start())
+        triangle.rotate(- PI / 2)
+        triangle.save_state()
+        start_angle = self.get_pending(curve,0)
+        triangle.rotate(start_angle, about_point=triangle.get_center())
+        
+        # camera
+        zoomed_camera = self.zoomed_camera
+        zoomed_display = self.zoomed_display
+        zoomed_display_frame = zoomed_display.display_frame
+        frame = zoomed_camera.frame
+        frame.move_to(triangle)\
+             .set_color(YELLOW)
+            
+        def update_triangle(mob,alpha):
+            triangle.restore()
+            angle = self.get_pending(curve,alpha)
+            triangle.move_to(curve.point_from_proportion(alpha))
+            triangle.rotate(angle,about_point=triangle.get_center())
+        def update_zoomed_camera(mob):
+            mob.move_to(triangle)
+        self.add(curve, triangle)
+        self.play(ShowCreation(frame))
+        self.activate_zooming()
+        self.play(
+            self.get_zoomed_display_pop_out_animation(),
+        )
+        self.play(
+            UpdateFromAlphaFunc(triangle,update_triangle),
+            UpdateFromFunc(frame,update_zoomed_camera),
+            run_time=8
+        )
+```
+
+输出结果：
+
+![](./video/7.gif)
+
+不知为什么放大镜头对于线的颜色和线宽不能有效体现出来。
 
 ### 部分相关函数
 
