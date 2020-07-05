@@ -26,6 +26,13 @@
   * 移动镜头
   * 部分相关函数
 * [ZoomedScene类](#ZoomedScene类)
+  * 配置
+  * 局部放大镜头
+  * 跟踪镜头
+  * 部分相关函数
+* [MultiCamera类](#MultiCamera类)
+  * 多镜头显示
+  * 部分相关函数
 
 ## 前言
 
@@ -1667,9 +1674,51 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 不知为什么放大镜头对于线的颜色和线宽不能有效体现出来。
 
+### 多镜头显示
+
+本来是想重新写个`MultiCameraScene`类的，可是不明白为什么`ZoomedScene`中的`camera`怎么自定义是`MultiCamera`的，而且实现的过程也需要`ZoomedScene`现成的函数，所以只能对着`ZoomedScene`源码改，改的面目全非，方法非常蠢非常笨。后面有闲工夫再来重新写`MultiCameraScene`类。
+
+先放效果：
+
+![](./video/9.gif)
+
+![](./video/10.gif)
+
 ### 部分相关函数
 
+* `activate_zooming(self, animate=False)`
 
+> 功能
+
+激活摄像头，荧幕才能接收到画面。
+
+> parameters
+
+`animate`：是否显示动画。个人认为`False`较好。
+
+* `get_zoom_in_animation(self, run_time=2, **kwargs)`
+
+> 功能
+
+获取动画？
+
+输出结果：
+
+![](./video/8.gif)
+
+* `get_zoomed_display_pop_out_animation(self, **kwargs)`
+
+> 功能
+
+显示动画的一种效果，详细可看上面局部放大镜头的例子。
+
+* `get_zoom_factor(self)`
+
+> 功能
+
+获取放大倍数。
+
+## 
 
 
 
