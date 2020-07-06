@@ -1718,7 +1718,47 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 获取放大倍数。
 
-## 
+---
 
+## `MultiScene`类
 
+[MultiScene](./code/MultiSceme)
+
+这个类是我模仿`ZoomedScene`类写的，太难看了，凑合着用吧。
+
+```python
+class MultiSceneDemo(MultiScene):
+    def construct(self):
+        d1 = Dot().shift(UP)
+        d2 = Dot().shift(DOWN)
+        self.add(d1,d2)
+        frame1 = self.zoomed_cameras[0].frame
+        frame2 = self.zoomed_cameras[1].frame
+        frame1.move_to(d1)\
+              .set_color(YELLOW)
+        frame2.move_to(d2)\
+              .set_color(BLUE)
+        self.zoomed_displays[0].to_corner(UR,buff=DEFAULT_MOBJECT_TO_EDGE_BUFFER)
+        self.zoomed_displays[1].to_corner(DR,buff=DEFAULT_MOBJECT_TO_EDGE_BUFFER)
+
+        zoomed_display_frmae1 = self.zoomed_displays[0].display_frame
+        zoomed_display_frmae2 = self.zoomed_displays[1].display_frame
+        zoomed_display_frmae1.set_color(YELLOW)
+        zoomed_display_frmae2.set_color(BLUE)
+        self.play(
+            ShowCreation(frame1),
+            ShowCreation(frame2),
+
+        )
+        self.activate_zooming()
+        self.wait()
+        self.get_zoomed_display_pop_out_animation()
+        self.wait()
+```
+
+输出结果：
+
+![](./video/11.gif)
+
+问题出现在不能同时`self.play()`。后面再改改。
 
