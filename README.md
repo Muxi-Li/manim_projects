@@ -1,6 +1,7 @@
 目录
 
 * [前言](#前言)
+* [视频地址](#视频地址)
 * [GraphScene类](#GraphScene类)
   * 坐标轴设置
     * 间隔为2的坐标轴刻度值
@@ -35,9 +36,37 @@
 
 ## 前言
 
-本着遇到各种坑再寻找解决方法的原则，总结了我遇到了各种坑的解决方法，有些是自己摸索出来的，可能并不是很好，有些是总结他人经验，后面会一一列出这些优秀的作者。
+本着先采坑再寻求解决方法的原则，我算是把做视频以来常见的坑踩了个遍。有些方法是借鉴别的up的，有的是自己摸索的，水平有限，仅供参考。
 
-## `GraphScene`类
+非常感谢下面这些up：
+
+* [鹤翔万里](https://github.com/Tony031218/manim_projects)
+* [cigar666](https://github.com/cigar666/my_manim_projects)
+* [pdcxs](https://github.com/pdcxs/ManimProjects)
+* [有一种悲伤叫颓废](https://github.com/136108Haumea/my-manim)
+
+其中`manim`幼儿园是上面几个up一起创建的小社区，仓库地址：[manim_sandbox](https://github.com/manim-kindergarten/manim_sandbox)
+
+---
+
+## 视频地址
+
+
+
+## `Grap`
+
+| 视频内容               | 文件地址                                                     | 视频链接                                                    |
+| ---------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| 阿基米德割圆法         | [7_pi](code/7_pi.py)                                         | [BV1zT4y1j7d4](https://www.bilibili.com/video/BV1zT4y1j7d4) |
+| 将线段n等分的十种方法  | [6_geometry](code/6_geometry.py)                             | [BV1qz411z7aa](https://www.bilibili.com/video/BV1qz411z7aa) |
+| 几个关于极限的简单定理 | [5_some_simple_theorems](code/5_some_simple_theorems.py)     | [BV1HK4y1k7gs](https://www.bilibili.com/video/BV1HK4y1k7gs) |
+| 无穷大与无穷小         | [4_infinity_and_infinitesimal](code/4_infinity_and_infinitesimal.py) | [BV1RA411t7Fo](https://www.bilibili.com/video/BV1RA411t7Fo) |
+| 函数极限的性质         | [3_function_properties](code/3_function_properties.py)       | [BV1pe411x75d](https://www.bilibili.com/video/BV1pe411x75d) |
+| 函数的极限             | [2_function_limit](code/2_function_limit.py)                 | [BV1Le411x7p2](https://www.bilibili.com/video/BV1Le411x7p2) |
+| 函数的奇偶性           | [1_function_parity](code/1_function_parity.py)               | [BV1v7411y7zR](https://www.bilibili.com/video/BV1v7411y7zR) |
+| 函数的单调性           | [0_function_graph](code/0_function_graph.py)                 | [BV1kE411A7Xm](https://www.bilibili.com/video/BV1kE411A7Xm) |
+
+## `hScene`类
 
 ### 坐标轴设置
 
