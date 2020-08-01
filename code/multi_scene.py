@@ -1,3 +1,12 @@
+from manimlib.animation.transform import ApplyMethod
+from manimlib.camera.moving_camera import MovingCamera
+from manimlib.camera.multi_camera import MultiCamera
+from manimlib.constants import *
+from manimlib.mobject.types.image_mobject import ImageMobjectFromCamera
+from manimlib.scene.moving_camera_scene import *
+from manimlib.scene.zoomed_scene import *
+from manimlib.utils.simple_functions import fdiv
+
 class MultiScene(ZoomedScene):
     CONFIG = {
         "camera_class": MultiCamera,
@@ -73,9 +82,10 @@ class MultiScene(ZoomedScene):
 
 
     def get_zoomed_display_pop_out_animation(self, **kwargs):
-        for zoomed_camera, zoomed_display in zip(self.zoomed_cameras,self.zoomed_displays):
-            zoomed_display.save_state(use_deepcopy=True)
-            zoomed_display.replace(zoomed_camera.frame, stretch=True)
-            self.play(
-                ApplyMethod(zoomed_display.restore)
-            )
+    apply_methods = []
+    for zoomed_camera, zoomed_display in zip(self.zoomed_cameras,self.zoomed_displays):
+        zoomed_display.save_state(use_deepcopy=True)
+        zoomed_display.replace(zoomed_camera.frame, stretch=True)
+        apply_method = ApplyMethod(zoomed_display.restore)
+        apply_methods.append(apply_method)
+    return apply_methods

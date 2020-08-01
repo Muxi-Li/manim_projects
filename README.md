@@ -1,4 +1,4 @@
-## 目录
+目录
 
 * [前言](#前言)
 * [GraphScene类](#GraphScene类)
@@ -30,9 +30,8 @@
   * 局部放大镜头
   * 跟踪镜头
   * 部分相关函数
-* [MultiCamera类](#MultiCamera类)
+* [MultiScene类](#MultiScene类)
   * 多镜头显示
-  * 部分相关函数
 
 ## 前言
 
@@ -1674,16 +1673,6 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 不知为什么放大镜头对于线的颜色和线宽不能有效体现出来。
 
-### 多镜头显示
-
-本来是想重新写个`MultiCameraScene`类的，可是不明白为什么`ZoomedScene`中的`camera`怎么自定义是`MultiCamera`的，而且实现的过程也需要`ZoomedScene`现成的函数，所以只能对着`ZoomedScene`源码改，改的面目全非，方法非常蠢非常笨。后面有闲工夫再来重新写`MultiCameraScene`类。
-
-先放效果：
-
-![](./video/9.gif)
-
-![](./video/10.gif)
-
 ### 部分相关函数
 
 * `activate_zooming(self, animate=False)`
@@ -1700,7 +1689,7 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 > 功能
 
-获取动画？
+获取动画？~~反正我不想用~~
 
 输出结果：
 
@@ -1722,9 +1711,15 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 ## `MultiScene`类
 
-[MultiScene](./code/MultiSceme)
+`MultiScene`类继承`ZoomedScene`类，所以一些配置参数直接看着`ZoomedScene`传就行了。
 
-这个类是我模仿`ZoomedScene`类写的，太难看了，凑合着用吧。
+代码：[MultiScene](./code/MultiSceme)
+
+关于给manim添加自定义类的问题我就不多费口舌了。
+
+这个类是我模仿`ZoomedScene`类写的，太难看了，凑合着用吧。跟`ZoomedScene`的用法差不多。
+
+### 多镜头显示
 
 ```python
 class MultiSceneDemo(MultiScene):
@@ -1732,6 +1727,7 @@ class MultiSceneDemo(MultiScene):
         d1 = Dot().shift(UP)
         d2 = Dot().shift(DOWN)
         self.add(d1,d2)
+        # 跟ZoomedScene一样，在外面设置frame，包括位置和颜色
         frame1 = self.zoomed_cameras[0].frame
         frame2 = self.zoomed_cameras[1].frame
         frame1.move_to(d1)\
@@ -1750,15 +1746,132 @@ class MultiSceneDemo(MultiScene):
             ShowCreation(frame2),
 
         )
+        # 激活所有display
         self.activate_zooming()
         self.wait()
-        self.get_zoomed_display_pop_out_animation()
+        # 获取每个display的applymethod，目的是一起播放，跟ZoomedScene的区别
+        apply_methods = self.get_zoomed_display_pop_out_animation()
+        self.play(
+            *[method for method in apply_methods]
+        )
         self.wait()
 ```
 
 输出结果：
 
-![](./video/11.gif)
+![](./video/12.gif)
 
-问题出现在不能同时`self.play()`。后面再改改。
+结合上面的跟踪镜头，可以让多个镜头实现跟踪效果。
 
+```python
+class ZoomedCameraMoveAlongPath2(MultiScene):
+    CONFIG = {
+        "curve_config": {
+            "t_min": 0,
+            "t_max": 6.3,
+            "color": PURPLE
+        },
+        "zoomed_display_height": 3,
+        "zoomed_display_width": 3,
+        "zoom_factor": 0.2,
+    }
+
+    def get_pending(self,path,proportion,dx=0.01):
+        if proportion < 1:
+            coord_i = path.point_from_proportion(proportion)
+            coord_f = path.point_from_proportion(proportion+dx)
+        else:
+            coord_i = path.point_from_proportion(proportion-dx)
+            coord_f = path.point_from_proportion(proportion)
+        line = Line(coord_i,coord_f)
+        angle = line.get_angle()
+        return angle
+    def construct(self):
+        def function(t):
+            a = 1
+            b = 0.5
+            x = a*np.sin(t)*(np.exp(np.cos(t))-2*np.cos(4*t)+(np.sin(t/12))**5)
+            y = b*np.cos(t)*(np.exp(np.cos(t))-2*np.cos(4*t)+(np.sin(t/12))**5)
+            return np.array([x,y,0])
+        # curve
+        curve = ParametricFunction(
+            function,
+            **self.curve_config
+        )
+        # triangle
+        triangle1 = Triangle().set_height(0.2) \
+            .set_color(BLUE)
+        triangle2 = Triangle().set_height(0.2) \
+            .set_color(YELLOW)
+        triangle1.rotate(-PI / 2)
+        triangle2.rotate(-PI / 2)
+        triangle1.save_state()
+        triangle2.save_state()
+        start_angle1 = self.get_pending(curve, 0)
+        start_angle2 = self.get_pending(curve, 0.5)
+        triangle1.move_to(curve.get_start())
+        triangle1.move_to(curve.point_from_proportion(1))
+        triangle1.rotate(start_angle1, about_point=triangle1.get_center())
+        triangle2.rotate(start_angle2, about_point=triangle1.get_center())
+
+        def update_triangle1(mob,alpha):
+            mob.restore()
+            angle = self.get_pending(curve,alpha)
+            mob.move_to(curve.point_from_proportion(alpha))
+            mob.rotate(angle,about_point=mob.get_center())
+        def update_triangle2(mob,alpha):
+            # triangle按反方向移动的
+            mob.restore()
+            angle = self.get_pending(curve,-alpha+1)+PI
+            mob.move_to(curve.point_from_proportion(-alpha+1))
+            mob.rotate(angle,about_point=mob.get_center())
+        self.add(curve,triangle1,triangle2)
+
+        zoomed_camera1 = self.zoomed_cameras[0]
+        zoomed_camera2 = self.zoomed_cameras[1]
+        zoomed_camera1.frame.set_color(BLUE)\
+                            .move_to(triangle1)
+        zoomed_camera2.frame.set_color(YELLOW)\
+                            .move_to(triangle2)
+
+        zoomed_display1 = self.zoomed_displays[0]
+        zoomed_display1.to_corner(DR)
+        zoomed_display2 = self.zoomed_displays[1]
+        zoomed_display2.to_corner(DL)
+
+        zoomed_display_frame1 = zoomed_display1.display_frame
+        zoomed_display_frame2 = zoomed_display2.display_frame
+        zoomed_display_frame1.set_color(BLUE)
+        zoomed_display_frame2.set_color(YELLOW)
+
+        def update_zoomed_camera1(mob):
+            mob.move_to(triangle1)
+        def update_zoomed_camera2(mob):
+            mob.move_to(triangle2)
+
+        self.play(
+            ShowCreation(zoomed_camera1.frame),
+            ShowCreation(zoomed_camera2.frame),
+        )
+        self.wait()
+        self.activate_zooming()
+        self.wait()
+        apply_methods = self.get_zoomed_display_pop_out_animation()
+        self.play(
+            *[method for method in apply_methods]
+        )
+        self.wait()
+        self.play(
+            UpdateFromAlphaFunc(triangle1, update_triangle1),
+            UpdateFromAlphaFunc(triangle2, update_triangle2),
+            UpdateFromFunc(zoomed_camera1.frame, update_zoomed_camera1),
+            UpdateFromFunc(zoomed_camera2.frame, update_zoomed_camera2),
+            run_time=10
+        )
+```
+
+输出结果：
+
+![](./video/10.gif)
+
+不过我觉得一般的视频放两个镜头都不错了，而且这个类用起来太麻烦了，需要在外面修改好多东西（矩形颜色和位置）,所以后面考虑在配置参数中直接设置好。:)
