@@ -1713,7 +1713,7 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 `MultiScene`类继承`ZoomedScene`类，所以一些配置参数直接看着`ZoomedScene`传就行了。
 
-代码：[MultiScene](./code/MultiSceme)
+代码：[MultiScene](./code/MultiSceme.py)
 
 关于给manim添加自定义类的问题我就不多费口舌了。
 
