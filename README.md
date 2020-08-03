@@ -1,4 +1,4 @@
-目录
+## 目录
 
 * [前言](#前言)
 * [视频地址](#视频地址)
@@ -33,6 +33,8 @@
   * 部分相关函数
 * [MultiScene类](#MultiScene类)
   * 多镜头显示
+* [SVGMobject类](#SVGMobject类)
+  * 上色
 
 ## 前言
 
@@ -51,10 +53,6 @@
 
 ## 视频地址
 
-
-
-## `Grap`
-
 | 视频内容               | 文件地址                                                     | 视频链接                                                    |
 | ---------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
 | 阿基米德割圆法         | [7_pi](code/7_pi.py)                                         | [BV1zT4y1j7d4](https://www.bilibili.com/video/BV1zT4y1j7d4) |
@@ -66,7 +64,9 @@
 | 函数的奇偶性           | [1_function_parity](code/1_function_parity.py)               | [BV1v7411y7zR](https://www.bilibili.com/video/BV1v7411y7zR) |
 | 函数的单调性           | [0_function_graph](code/0_function_graph.py)                 | [BV1kE411A7Xm](https://www.bilibili.com/video/BV1kE411A7Xm) |
 
-## `hScene`类
+不过个人觉得参考代码的价值不大，因为有肝就可以做得出来。
+
+## `GraphScene`类
 
 ### 坐标轴设置
 
@@ -1736,6 +1736,8 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 获取放大倍数。
 
+[返回目录](#目录)
+
 ---
 
 ## `MultiScene`类
@@ -1904,3 +1906,53 @@ class ZoomedCameraMoveAlongPath2(MultiScene):
 ![](./video/10.gif)
 
 不过我觉得一般的视频放两个镜头都不错了，而且这个类用起来太麻烦了，需要在外面修改好多东西（矩形颜色和位置）,所以后面考虑在配置参数中直接设置好。:)
+
+[返回目录](#目录)
+
+---
+
+## `SVGMobject`类
+
+### 上色
+
+`manim`的`SVGmobject`不会显示原本的颜色，需要自己设置:D(~~太鸡肋了~~)，所以没事不要在`manim`中使用`SVGmobject`吧。
+
+比如我要导入下面一张`svg`：
+
+<img src="./img/22.png" style="zoom:50%;" />
+
+```python
+class Demo(Scene):
+    def construct(self):
+        test = SVGMobject("test")
+        self.add(test)
+```
+
+输出结果：
+
+<img src="./img/23.png" style="zoom:50%;" />
+
+所以，屏幕中要么是黑色要么是白色!
+
+手动修改：
+
+```python
+class Demo(Scene):
+    def construct(self):
+        test = Rec_elli("test")
+        self.add(test)
+
+class Rec_elli(SVGMobject):
+    def __init__(self,svg_file,**kwargs):
+        SVGMobject.__init__(self,file_name=svg_file,**kwargs)
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+        self.submobjects[0].set_fill(YELLOW)
+        self.submobjects[1].set_fill(RED)
+```
+
+输出结果：
+
+<img src="./img/24.png" style="zoom:50%;" />
+
+这还是只有两个简单图形的，万一导入的`svg`包含十几个路径。。。。。。
