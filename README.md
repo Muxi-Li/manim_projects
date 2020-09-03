@@ -4,13 +4,14 @@
 * [视频地址](#视频地址)
 * [Scene部分](#Scene部分)
   * [GraphScene类](#GraphScene类)
-    * 间隔为2的坐标轴刻度值
-    * 原点非0的刻度值
-    * 小数刻度值
-  * 函数曲线
-    * `ParametricFunction`类
-    * `FunctionGraph`类
-  * `GraphScene`的相关函数
+    * 配置坐标轴
+      * 间隔为2的坐标轴刻度值
+      * 原点非0的刻度值
+      * 小数刻度值
+    * 函数曲线
+      * `ParametricFunction`类
+      * `FunctionGraph`类
+    * `GraphScene`的相关函数
 * [文字类](#文字类)
   * 文字上色
   * 字体对齐
