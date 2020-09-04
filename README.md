@@ -12,30 +12,36 @@
       * `ParametricFunction`类
       * `FunctionGraph`类
     * `GraphScene`的相关函数
-* [文字类](#文字类)
-  * 文字上色
-  * 字体对齐
-  * 自定义字体
-* [update()函数](#updater)
-  * 一般用法
-  * `dt`参数
-  * `ValueTracker`
-* [Camera类](#Camera类)
-  * 配置
-  * 部分相关函数
-* [MovingCameraScene类](#MovingCameraScene类)
-  * 放大镜头
-  * 移动镜头
-  * 部分相关函数
-* [ZoomedScene类](#ZoomedScene类)
-  * 配置
-  * 局部放大镜头
-  * 跟踪镜头
-  * 部分相关函数
-* [MultiScene类](#MultiScene类)
-  * 多镜头显示
-* [SVGMobject类](#SVGMobject类)
-  * 上色
+  * [MovingCameraScene类](#MovingCameraScene类)
+    * 放大镜头
+    * 移动镜头
+    * 部分相关函数
+  * [MovingCameraScene类](#MovingCameraScene类)
+    * 放大镜头
+    * 移动镜头
+    * 部分相关函数
+  * [ZoomedScene类](#ZoomedScene类)
+    * 配置
+    * 局部放大镜头
+    * 跟踪镜头
+    * 部分相关函数
+  * [MultiScene类](#MultiScene类)
+    * 多镜头显示
+* [Mobject部分](#Mobject部分)
+  * [文字类](#文字类)
+    * 文字上色
+    * 字体对齐
+    * 自定义字体
+  * [SVGMobject类](#SVGMobject类)
+    * 上色
+  * [update()函数](#updater)
+    * 一般用法
+    * `dt`参数
+    * `ValueTracker`
+* [Camera部分](#Camera部分)
+  * [Camera类](#Camera类)
+    * 配置
+    * 部分相关函数
 
 # 前言
 
@@ -607,8 +613,6 @@ class Demo(Scene):
 
 `y`：纵坐标
 
-
-
 * `point_to_coords(self, point)`
 
 > 功能
@@ -622,8 +626,6 @@ class Demo(Scene):
 > return
 
 `[x,y]`
-
-
 
 * `input_to_graph_point(self, x, graph)`
 
@@ -641,8 +643,6 @@ class Demo(Scene):
 
 `point`
 
-
-
 * `angle_of_tangent(self, x, graph, dx=0.01)`
 
 > 功能
@@ -657,8 +657,6 @@ class Demo(Scene):
 
 `dx=0.01`：计算斜率肯定需要两个点，这是两个点的横坐标间隔，默认为0.01。
 
-
-
 * `slope_of_tangent(self, *args, **kwargs)`
 
 > 功能
@@ -668,8 +666,6 @@ class Demo(Scene):
 > parameters
 
 跟`angle_of_tangent`传一样的参数即可。
-
-
 
 * `get_derivative_graph(self, graph, dx=0.01, **kwargs)`
 
@@ -682,8 +678,6 @@ class Demo(Scene):
 `graph`：已经生成的graph。
 
 `dx`：微小量。
-
-
 
 * `get_graph_label(self,graph,label="f(x)",x_val=None,direction=RIGHT,buff=MED_SMALL_BUFF,color=None)`
 
@@ -908,582 +902,6 @@ class MyGraph(GraphScene):
 `**anim_kwargs`：其他一些关键字参数。
 
 [回到目录](#目录)
-
----
-
-## 文字类
-
-对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
-
-#### 文字上色
-
-1. **`TexMobject`:  分开字符，分别上色**
-
-```python
-class MyFormula(Scene):
-    def construct(self):
-        tex = TexMobject("\\lim_",             # 0
-                          "{h",                 # 1
-                          "\\rightarrow","0}",  # 2
-                          "{f",                 # 3
-                          "\\left(",            # 4
-                          "x",                  # 5
-                          "+",                  # 6
-                          "h",                  # 7
-                          "\\right)",           # 8
-                          "-",                  # 9
-                          "f",                  # 10
-                          "\\left(",            # 11
-                          "h",                  # 12
-                          "\\right)",           # 13
-                          "\\over",             # 14
-                          "h}"                  # 15
-        ).scale(0.7)
-        text[0].set_color(RED)
-        text[1].set_color(BLUE)
-        text[2].set_color(GREEN)
-        text[3].set_color(YELLOW)
-        text[4].set_color(PINK)
-        text[5].set_color(ORANGE)
-        text[6].set_color(PURPLE)
-        text[7].set_color(MAROON)
-        text[8].set_color(TEAL)
-        text[9].set_color(GOLD)
-        text[10].set_color(GRAY)
-        text[11].set_color("#F8C471")
-        text[12].set_color("#D0D3D4")
-        text[13].set_color("#512E5F")
-        text[14].set_color("#273746")
-        text[15].set_color("#E6B0AA")
-        text[16].set_color("#2ECC71")
-        self.play(Write(text))
-        self.wait(2)
-```
-
-输出结果：
-
-<img src="./img/11.png" style="zoom:50%;" />
-
-这里对于有分数的上色推荐使用`\\over`而不是用`\\frac{}{}`，后者可能会出现意想不到的问题。
-
-这里可以进一步优化（**推荐**）：
-
-```python
-class MyFormula(Scene):
-    def construct(self):
-        tex = TexMobject("\\lim_",              # 0
-                          "{h",                 # 1
-                          "\\rightarrow",		# 2
-                          "0}",  				# 3
-                          "{f",                 # 4
-                          "\\left(",            # 5
-                          "x",                  # 6
-                          "+",                  # 7
-                          "h",                  # 8
-                          "\\right)",           # 9
-                          "-",                  # 10
-                          "f",                  # 11
-                          "\\left(",            # 12
-                          "h",                  # 13
-                          "\\right)",           # 14
-                          "\\over",             # 15
-                          "h}"                  # 16
-        ).scale(1.2)
-        # 这里设置color_data非常灵活，不必拘泥于此
-        color_data = [
-            RED,
-            BLUE,
-            GREEN,
-            YELLOW,
-            PINK,
-            ORANGE,
-            PURPLE,
-            MAROON,
-            TEAL,
-            GOLD,
-            GRAY,
-            "#F8C471",
-            "#D0D3D4",
-            "#512E5F",
-            "#273746",
-            "#E6B0AA",
-            "#2ECC71"
-        ]
-        for i,color in zip(range(17),color_data):
-            tex[i].set_color(color)
-        self.play(Write(tex))
-        self.wait(2)
-```
-
-输出结果：
-
-<img src="./img/12.png" style="zoom:50%;" />
-
-2. **`TexMobject`：使用`set_color_by_tex_to_color_map(t2c)`函数**
-
-```python
-class MyFormula(Scene):
-    CONFIG = {
-        "t2c":{
-            "\\lim_":RED,
-            "{h":BLUE,
-            "\\rightarrow":GREEN,
-            "0}":YELLOW,
-            "{f":PINK,
-            "\\left(":ORANGE,
-            "x":PURPLE,
-             "+":MAROON,
-             "h":TEAL,
-             "\\right)":GOLD,
-             "-":GRAY,
-             "f":"#F8C471",
-             "\\left(":"#D0D3D4",
-             "h":"#512E5F",
-             "\\right)":"#273746",
-             "\\over":"#E6B0AA",
-             "h}":"#2ECC71"
-
-    }
-    }
-    def construct(self):
-        tex = TexMobject("\\lim_",              # 0
-                          "{h",                 # 1
-                          "\\rightarrow",       # 2
-                          "0}",                 # 3
-                          "{f",                 # 4
-                          "\\left(",            # 5
-                          "x",                  # 6
-                          "+",                  # 7
-                          "h",                  # 8
-                          "\\right)",           # 9
-                          "-",                  # 10
-                          "f",                  # 11
-                          "\\left(",            # 12
-                          "h",                  # 13
-                          "\\right)",           # 14
-                          "\\over",             # 15
-                          "h}"                  # 16
-        ).scale(1.2)
-        tex.set_color_by_tex_to_color_map(self.t2c)
-        self.add(tex)
-```
-
-输出结果：
-
-<img src="./img/13.png" style="zoom:50%;" />
-
-显而易见，使用`t2c`字典，使相同字符有一样的颜色，有优势也有弊端。
-
-这里为什么没提到`TextMobject`呢？主要是`TextMobject`有中文的时候我非常讨厌上色，拆分很烦，就不想那么复杂，反正上色的话跟上面提到的差不多，而且还不如用`Text`。
-
-3. **`Text`:  使用set_color_by_t2c(t2c)函数**
-
-`Text`类是用来显示不同中文字体的类，个人非常喜欢，如果你的版本里的`Text`有`bug`的话，可以去`manim`的`GitHub`上看别人提交的`Pull requests`，有修复`Text`的方法。
-
-```python
-class Demo(Scene):
-    CONFIG = {
-        't2c':{
-            'a': RED,
-            'b': YELLOW,
-            'c': GREEN,
-            '你': PURPLE,
-            '好': MAROON,
-            ',': TEAL
-        }
-    }
-    def construct(self):
-        text = Text("abc,你好",font="思源黑体")
-        text.set_color_by_t2c(self.t2c)
-        self.add(text)
-```
-
-输出结果：
-
-<img src="./img/14.png" style="zoom:50%;" />
-
-对中文也这样，太棒了！！！
-
-#### 字体对齐  
-
-1. **next_to()**
-
-```python
-class Demo(Scene):
-    def construct(self):
-        tex1 = TexMobject("a").scale(0.8)
-        tex2 = TexMobject("ab").scale(0.8)
-        tex3 = TexMobject("abc").scale(0.8)
-        tex4 = TexMobject("abcd").scale(0.8)
-        tex5 = TexMobject("abcde").scale(0.8)
-        tex6 = TexMobject("abcdef").scale(0.8)
-        # 改变aligned_edge左对齐
-        tex1.shift(2*UP)
-        tex2.next_to(tex1,direction=DOWN,buff=0.3,aligned_edge=LEFT)
-        tex3.next_to(tex2, direction=DOWN, buff=0.3, aligned_edge=LEFT)
-        tex4.next_to(tex3, direction=DOWN, buff=0.3, aligned_edge=LEFT)
-        tex5.next_to(tex4, direction=DOWN, buff=0.3, aligned_edge=LEFT)
-        tex6.next_to(tex5, direction=DOWN, buff=0.3, aligned_edge=LEFT)
-        self.add(tex1,tex2,tex3,tex4,tex5,tex6)
-```
-
-输出结果：
-
-<img src="./img/15.png" style="zoom:50%;" />
-
-默认的情况下是中间对齐，如：上面代码不添加`aligned_edge=LEFT`，则效果如下：
-
-<img src="./img/16.png" style="zoom:50%;" />
-
-2. **arrange()**
-
-使用`VGroup()`的`arrange()`函数，这个函数的本质是`next_to()`。非常方便，个人推荐。
-
-```python
-class Demo(Scene):
-    def construct(self):
-        tex = [
-            "a",
-            "ab",
-            "abc",
-            "abcd",
-            "abcde",
-            "abcdef"
-        ]
-        tex_mob = VGroup(
-            *[TexMobject(mob).scale(0.8) for mob in tex]
-        )
-        tex_mob.arrange(
-            direction=DOWN,		# next_to()	的direction形参
-            aligned_edge=LEFT,	# 左对齐
-            buff=0.3
-        )
-        self.add(tex_mob)
-```
-
-输出结果：
-
-<img src="./img/17.png" style="zoom:50%;" />
-
-还可以有第三种方法，那就是`latex`语法对齐，但我还没系统的学`latex`，所以就不写了，也少用。
-
-[回到目录](#目录)
-
----
-
-## `updater`
-
-### 一般用法
-
-```python
-class AddUpdater1(Scene):
-    def construct(self):
-        dot = Dot()
-        text = TextMobject("Label")\
-               .next_to(dot,RIGHT,buff=SMALL_BUFF)
-
-        self.add(dot,text)
-
-        # Update function
-        def update_text(obj):
-            obj.next_to(dot,RIGHT,buff=SMALL_BUFF)
-
-        # Add update function to the objects
-        text.add_updater(update_text)
-
-        # Add the object again
-        self.add(text)
-
-        self.play(dot.shift,UP*2)
-
-        # Remove update function
-        text.remove_updater(update_text)
-
-        self.wait()
-```
-
-输出结果：
-
-![](./video/2.gif)
-
-使用` text.add_updater(update_text)`将`label`与点绑定在一起，一起运动。
-
-### `dt`参数
-
-```python
-class UpdateDemo1(GraphScene):
-    CONFIG = {
-        "t_offset": -3,
-        "x_max": 3,
-        "x_min": -3,
-        "y_min": -9,
-        "y_max": 9,
-        "x_tick_frequency": 1,
-        "y_tick_frequency": 1,
-        "axes_color": "BLUE",
-        "graph_origin": ORIGIN
-
-    }
-    def construct(self):
-
-        # 创建一个坐标系
-        self.setup_axes(animate=False)
-        graph = self.get_graph(self.func, x_min=-3, x_max=3, color=RED)
-        self.play(ShowCreation(graph))
-        self.wait()
-        # 创建一个点，点在图像上移动
-        dot = Dot().move_to(self.coords_to_point(-3, self.func(-3)))
-        self.add(dot)
-        self.wait()
-        def update_dot(mob, dt):
-            # dt就是帧速率，一帧等于多少秒
-            rate = 0.5*dt	# 设置速度
-            mob.move_to(self.coords_to_point(self.t_offset +
-                                             rate, self.func(self.t_offset+rate)))
-            # self.t_offset是起始值
-            self.t_offset += rate
-        dot.add_updater(update_dot)
-
-        # 创建两条虚线,随着dot移动
-        line1 = DashedLine(start=self.coords_to_point(-3, 0),
-                           end=self.coords_to_point(-3, self.func(-3)))
-        line2 = DashedLine(start=self.coords_to_point(-3, self.func(-3)),
-                           end=self.coords_to_point(0, self.func(-3)))
-        self.add(line1, line2)
-
-        def update_line1(mob):
-            l = DashedLine(
-                start=self.coords_to_point(self.t_offset, 0), 											end=self.coords_to_point(
-                self.t_offset, self.func(self.t_offset))
-            )
-            mob.become(l)
-
-        def update_line2(mob):
-            l = DashedLine(
-                start=self.coords_to_point(self.t_offset, self.func(
-                self.t_offset)), 
-                end=self.coords_to_point(0, self.func(self.t_offset)))
-            mob.become(l)
-        line1.add_updater(update_line1)
-        line2.add_updater(update_line2)
-		# 一定要加下面这句
-        self.add(dot, line1, line2)
-        self.wait(12)	# 这里控制运动时间
-        dot.remove_updater(update_dot)
-        # 去掉关联
-        line1.remove_updater(update_line1)
-        line2.remove_updater(update_line2)
-
-    def func(self, x):
-        return x**2
-```
-
-
-
-
-
-<img src="./video/1.gif" style="zoom: 80%;" />
-
-按照我的理解就是：点是父级，两条虚线是子集，点的坐标通过`dt`参数实现每前进一帧时改变它的坐标，从而达到运动效果，两条虚线通过`become()`函数实现不断的刷新，与点的位置相关联。
-
-### `ValueTracker`
-
-我的理解就是一个跟踪者，时刻记录某个值得变化，并将这种变化反映到某个物体上。
-
-```python
-class Wheel(MovingCameraScene,GraphScene):
-    def construct(self):
-        self.camera.frame.move_to(2 * RIGHT)
-        r = 1
-        o = Dot(radius=0.07,color=GREEN).shift(UP)
-        p = Dot(radius=0.07,color=RED)
-        q = p.deepcopy()
-        w = p.deepcopy()
-        c = Circle(arc_center=o.get_center(),radius=r,color=BLUE)
-        arrow = Arrow(o.get_center(),p.get_center(),buff=0,color=YELLOW)
-        l = Line(p,w,color="#99CC33")
-        theta = ValueTracker(0)
-        def get_o(theta):
-            return (theta*r*RIGHT+UP)
-        o.add_updater(
-            lambda o:o.move_to(get_o(theta.get_value()))
-        )
-        c.add_updater(
-            lambda c:c.move_to(o.get_center())
-        )
-        def get_p(theta):
-            return (RIGHT*r*(theta-np.sin(theta))+UP*r*(1-np.cos(theta)))
-        p.add_updater(
-            lambda p:p.move_to(get_p(theta.get_value()))
-        )
-        def get_w(theta):
-            return (theta * r * RIGHT)
-        w.add_updater(
-            lambda d:d.move_to(get_w(theta.get_value()))
-        )
-        arrow.add_updater(
-            lambda mob:mob.become(
-                Arrow(
-                    o.get_center(),
-                    p.get_center(),
-                    buff=0,
-                    color=YELLOW
-                )
-            )
-        )
-        l.add_updater(
-            lambda l:l.become(
-                Line(q.get_center(),w.get_center(),color="#99CC33")
-            )
-        )
-        self.add(o,p,c,arrow,l,q,w)
-        self.wait()
-        self.play(
-            theta.increment_value,2*PI,
-            run_time=8
-        )
-```
-
-输出结果：
-
-![](./video/3.gif)
-
-[回到目录](#目录)
-
----
-
-## `Camera`类
-
-### 配置
-
-```python
-CONFIG = {
-        "background_image": None,	# 图片背景，可以用绝对路径
-        "pixel_height": DEFAULT_PIXEL_HEIGHT,	# 像素高度，默认1440
-        "pixel_width": DEFAULT_PIXEL_WIDTH,		# 像素宽度，默认2560
-        "frame_rate": DEFAULT_FRAME_RATE,		# 帧速率
-        # Note: frame height and width will be resized to match
-        # the pixel aspect ratio
-        "frame_height": FRAME_HEIGHT,	# 画面高度
-        "frame_width": FRAME_WIDTH,		# 画面宽度
-        "frame_center": ORIGIN,			# 镜头焦点
-        "background_color": BLACK,		# 背景颜色
-        "background_opacity": 1,		# 背景不透明度
-        # Points in vectorized mobjects with norm greater
-        # than this value will be rescaled.
-        "max_allowable_norm": FRAME_WIDTH,
-        "image_mode": "RGBA",
-        "n_channels": 4,
-        "pixel_array_dtype": 'uint8',
-        # z_buff_func is only used if the flag above is set to True.
-        # round z coordinate to nearest hundredth when comparring
-        "z_buff_func": lambda m: np.round(m.get_center()[2], 2),
-        "cairo_line_width_multiple": 0.01,
-        "open_plot_depth":True,
-    }
-```
-
-在`CONFIG`中配置摄像头:
-
-```python
-class CameraTest(Scene):
-    CONFIG = {
-        "camera_config":{
-            "background_image":r"C:\Users\MuxiLi\Pictures\Saved Pictures\阳菜 (2).jpg"
-        }
-    }
-    def construct(self):
-        tex = TexMobject("hello")
-        self.add(tex)
-```
-
-输出结果：其他的属性也可以这样配置。
-
-<img src="./img/18.png" style="zoom:50%;" />
-
-### 部分相关函数
-
-* `reset_pixel_shape(self, new_height, new_width)`
-
-> 功能
-
-重新设置一个像素的大小。
-
-> parameters
-
-`new_height`：新设置的像素高度。
-
-`new_width`：新设置的像素的宽度。
-
-* `get_pixel_height(self)`
-
-> 功能
-
-获取当前场景像素的高度。
-
-* `get_pixel_width(self)`
-
-> 功能
-
-获取当前场景像素的宽度。
-
-* `get_frame_height(self)`
-
-> 功能
-
-获取当前画面高度。
-
-* `get_frame_width(self)`
-
-> 功能
-
-获取当前画面的宽度。
-
-* `get_frame_center(self)`
-
-> 功能
-
-获取当前镜头的焦点。
-
-* `set_frame_height(self, frame_height)`
-
-> 功能
-
-设置画面的高度。
-
-> parameters
-
-`frame_height`：画面高度。
-
-* `set_frame_width(self, frame_width)`
-
-> 功能
-
-设置画面的宽度。
-
-> parameters
-
-`frame_width`：画面宽度。
-
-* `set_frame_center(self, frame_center)`
-
-> 功能
-
-设置镜头焦点。
-
-> parameters
-
-`frame_center`：镜头焦点坐标。
-
-* `is_in_frame(self, mobject)`
-
-> 功能
-
-判断物体`mobject`是否在画面中。
-
-~~算了，后面的函数看不懂。~~
-
-[返回目录](#目录)
 
 ---
 
@@ -1914,6 +1332,268 @@ class ZoomedCameraMoveAlongPath2(MultiScene):
 
 ---
 
+# Mobject部分
+
+## 文字类
+
+对于文字操作，我们更多的时候，是考虑文字对齐、上色美化问题。
+
+#### 文字上色
+
+1. **`TexMobject`:  分开字符，分别上色**
+
+```python
+class MyFormula(Scene):
+    def construct(self):
+        tex = TexMobject("\\lim_",             # 0
+                          "{h",                 # 1
+                          "\\rightarrow","0}",  # 2
+                          "{f",                 # 3
+                          "\\left(",            # 4
+                          "x",                  # 5
+                          "+",                  # 6
+                          "h",                  # 7
+                          "\\right)",           # 8
+                          "-",                  # 9
+                          "f",                  # 10
+                          "\\left(",            # 11
+                          "h",                  # 12
+                          "\\right)",           # 13
+                          "\\over",             # 14
+                          "h}"                  # 15
+        ).scale(0.7)
+        text[0].set_color(RED)
+        text[1].set_color(BLUE)
+        text[2].set_color(GREEN)
+        text[3].set_color(YELLOW)
+        text[4].set_color(PINK)
+        text[5].set_color(ORANGE)
+        text[6].set_color(PURPLE)
+        text[7].set_color(MAROON)
+        text[8].set_color(TEAL)
+        text[9].set_color(GOLD)
+        text[10].set_color(GRAY)
+        text[11].set_color("#F8C471")
+        text[12].set_color("#D0D3D4")
+        text[13].set_color("#512E5F")
+        text[14].set_color("#273746")
+        text[15].set_color("#E6B0AA")
+        text[16].set_color("#2ECC71")
+        self.play(Write(text))
+        self.wait(2)
+```
+
+输出结果：
+
+<img src="./img/11.png" style="zoom:50%;" />
+
+这里对于有分数的上色推荐使用`\\over`而不是用`\\frac{}{}`，后者可能会出现意想不到的问题。
+
+这里可以进一步优化（**推荐**）：
+
+```python
+class MyFormula(Scene):
+    def construct(self):
+        tex = TexMobject("\\lim_",              # 0
+                          "{h",                 # 1
+                          "\\rightarrow",		# 2
+                          "0}",  				# 3
+                          "{f",                 # 4
+                          "\\left(",            # 5
+                          "x",                  # 6
+                          "+",                  # 7
+                          "h",                  # 8
+                          "\\right)",           # 9
+                          "-",                  # 10
+                          "f",                  # 11
+                          "\\left(",            # 12
+                          "h",                  # 13
+                          "\\right)",           # 14
+                          "\\over",             # 15
+                          "h}"                  # 16
+        ).scale(1.2)
+        # 这里设置color_data非常灵活，不必拘泥于此
+        color_data = [
+            RED,
+            BLUE,
+            GREEN,
+            YELLOW,
+            PINK,
+            ORANGE,
+            PURPLE,
+            MAROON,
+            TEAL,
+            GOLD,
+            GRAY,
+            "#F8C471",
+            "#D0D3D4",
+            "#512E5F",
+            "#273746",
+            "#E6B0AA",
+            "#2ECC71"
+        ]
+        for i,color in zip(range(17),color_data):
+            tex[i].set_color(color)
+        self.play(Write(tex))
+        self.wait(2)
+```
+
+输出结果：
+
+<img src="./img/12.png" style="zoom:50%;" />
+
+2. **`TexMobject`：使用`set_color_by_tex_to_color_map(t2c)`函数**
+
+```python
+class MyFormula(Scene):
+    CONFIG = {
+        "t2c":{
+            "\\lim_":RED,
+            "{h":BLUE,
+            "\\rightarrow":GREEN,
+            "0}":YELLOW,
+            "{f":PINK,
+            "\\left(":ORANGE,
+            "x":PURPLE,
+             "+":MAROON,
+             "h":TEAL,
+             "\\right)":GOLD,
+             "-":GRAY,
+             "f":"#F8C471",
+             "\\left(":"#D0D3D4",
+             "h":"#512E5F",
+             "\\right)":"#273746",
+             "\\over":"#E6B0AA",
+             "h}":"#2ECC71"
+
+    }
+    }
+    def construct(self):
+        tex = TexMobject("\\lim_",              # 0
+                          "{h",                 # 1
+                          "\\rightarrow",       # 2
+                          "0}",                 # 3
+                          "{f",                 # 4
+                          "\\left(",            # 5
+                          "x",                  # 6
+                          "+",                  # 7
+                          "h",                  # 8
+                          "\\right)",           # 9
+                          "-",                  # 10
+                          "f",                  # 11
+                          "\\left(",            # 12
+                          "h",                  # 13
+                          "\\right)",           # 14
+                          "\\over",             # 15
+                          "h}"                  # 16
+        ).scale(1.2)
+        tex.set_color_by_tex_to_color_map(self.t2c)
+        self.add(tex)
+```
+
+输出结果：
+
+<img src="./img/13.png" style="zoom:50%;" />
+
+显而易见，使用`t2c`字典，使相同字符有一样的颜色，有优势也有弊端。
+
+这里为什么没提到`TextMobject`呢？主要是`TextMobject`有中文的时候我非常讨厌上色，拆分很烦，就不想那么复杂，反正上色的话跟上面提到的差不多，而且还不如用`Text`。
+
+3. **`Text`:  使用set_color_by_t2c(t2c)函数**
+
+`Text`类是用来显示不同中文字体的类，个人非常喜欢，如果你的版本里的`Text`有`bug`的话，可以去`manim`的`GitHub`上看别人提交的`Pull requests`，有修复`Text`的方法。
+
+```python
+class Demo(Scene):
+    CONFIG = {
+        't2c':{
+            'a': RED,
+            'b': YELLOW,
+            'c': GREEN,
+            '你': PURPLE,
+            '好': MAROON,
+            ',': TEAL
+        }
+    }
+    def construct(self):
+        text = Text("abc,你好",font="思源黑体")
+        text.set_color_by_t2c(self.t2c)
+        self.add(text)
+```
+
+输出结果：
+
+<img src="./img/14.png" style="zoom:50%;" />
+
+对中文也这样，太棒了！！！
+
+#### 字体对齐  
+
+1. **next_to()**
+
+```python
+class Demo(Scene):
+    def construct(self):
+        tex1 = TexMobject("a").scale(0.8)
+        tex2 = TexMobject("ab").scale(0.8)
+        tex3 = TexMobject("abc").scale(0.8)
+        tex4 = TexMobject("abcd").scale(0.8)
+        tex5 = TexMobject("abcde").scale(0.8)
+        tex6 = TexMobject("abcdef").scale(0.8)
+        # 改变aligned_edge左对齐
+        tex1.shift(2*UP)
+        tex2.next_to(tex1,direction=DOWN,buff=0.3,aligned_edge=LEFT)
+        tex3.next_to(tex2, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        tex4.next_to(tex3, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        tex5.next_to(tex4, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        tex6.next_to(tex5, direction=DOWN, buff=0.3, aligned_edge=LEFT)
+        self.add(tex1,tex2,tex3,tex4,tex5,tex6)
+```
+
+输出结果：
+
+<img src="./img/15.png" style="zoom:50%;" />
+
+默认的情况下是中间对齐，如：上面代码不添加`aligned_edge=LEFT`，则效果如下：
+
+<img src="./img/16.png" style="zoom:50%;" />
+
+2. **arrange()**
+
+使用`VGroup()`的`arrange()`函数，这个函数的本质是`next_to()`。非常方便，个人推荐。
+
+```python
+class Demo(Scene):
+    def construct(self):
+        tex = [
+            "a",
+            "ab",
+            "abc",
+            "abcd",
+            "abcde",
+            "abcdef"
+        ]
+        tex_mob = VGroup(
+            *[TexMobject(mob).scale(0.8) for mob in tex]
+        )
+        tex_mob.arrange(
+            direction=DOWN,		# next_to()	的direction形参
+            aligned_edge=LEFT,	# 左对齐
+            buff=0.3
+        )
+        self.add(tex_mob)
+```
+
+输出结果：
+
+<img src="./img/17.png" style="zoom:50%;" />
+
+还可以有第三种方法，那就是`latex`语法对齐，但我还没系统的学`latex`，所以就不写了，也少用。
+
+[返回目录](#目录)
+
+---
+
 ## `SVGMobject`类
 
 ### 上色
@@ -1959,3 +1639,323 @@ class Rec_elli(SVGMobject):
 <img src="./img/24.png" style="zoom:50%;" />
 
 这还是只有两个简单图形的，万一导入的`svg`包含十几个路径。。。。。。
+
+[返回目录](#目录)
+
+---
+
+## `updater`
+
+### 一般用法
+
+```python
+class AddUpdater1(Scene):
+    def construct(self):
+        dot = Dot()
+        text = TextMobject("Label")\
+               .next_to(dot,RIGHT,buff=SMALL_BUFF)
+
+        self.add(dot,text)
+
+        # Update function
+        def update_text(obj):
+            obj.next_to(dot,RIGHT,buff=SMALL_BUFF)
+
+        # Add update function to the objects
+        text.add_updater(update_text)
+
+        # Add the object again
+        self.add(text)
+
+        self.play(dot.shift,UP*2)
+
+        # Remove update function
+        text.remove_updater(update_text)
+
+        self.wait()
+```
+
+输出结果：
+
+![](./video/2.gif)
+
+使用` text.add_updater(update_text)`将`label`与点绑定在一起，一起运动。
+
+### `dt`参数
+
+```python
+class UpdateDemo1(GraphScene):
+    CONFIG = {
+        "t_offset": -3,
+        "x_max": 3,
+        "x_min": -3,
+        "y_min": -9,
+        "y_max": 9,
+        "x_tick_frequency": 1,
+        "y_tick_frequency": 1,
+        "axes_color": "BLUE",
+        "graph_origin": ORIGIN
+
+    }
+    def construct(self):
+
+        # 创建一个坐标系
+        self.setup_axes(animate=False)
+        graph = self.get_graph(self.func, x_min=-3, x_max=3, color=RED)
+        self.play(ShowCreation(graph))
+        self.wait()
+        # 创建一个点，点在图像上移动
+        dot = Dot().move_to(self.coords_to_point(-3, self.func(-3)))
+        self.add(dot)
+        self.wait()
+        def update_dot(mob, dt):
+            # dt就是帧速率，一帧等于多少秒
+            rate = 0.5*dt	# 设置速度
+            mob.move_to(self.coords_to_point(self.t_offset +
+                                             rate, self.func(self.t_offset+rate)))
+            # self.t_offset是起始值
+            self.t_offset += rate
+        dot.add_updater(update_dot)
+
+        # 创建两条虚线,随着dot移动
+        line1 = DashedLine(start=self.coords_to_point(-3, 0),
+                           end=self.coords_to_point(-3, self.func(-3)))
+        line2 = DashedLine(start=self.coords_to_point(-3, self.func(-3)),
+                           end=self.coords_to_point(0, self.func(-3)))
+        self.add(line1, line2)
+
+        def update_line1(mob):
+            l = DashedLine(
+                start=self.coords_to_point(self.t_offset, 0), 											end=self.coords_to_point(
+                self.t_offset, self.func(self.t_offset))
+            )
+            mob.become(l)
+
+        def update_line2(mob):
+            l = DashedLine(
+                start=self.coords_to_point(self.t_offset, self.func(
+                self.t_offset)), 
+                end=self.coords_to_point(0, self.func(self.t_offset)))
+            mob.become(l)
+        line1.add_updater(update_line1)
+        line2.add_updater(update_line2)
+		# 一定要加下面这句
+        self.add(dot, line1, line2)
+        self.wait(12)	# 这里控制运动时间
+        dot.remove_updater(update_dot)
+        # 去掉关联
+        line1.remove_updater(update_line1)
+        line2.remove_updater(update_line2)
+
+    def func(self, x):
+        return x**2
+```
+
+
+
+
+
+<img src="./video/1.gif" style="zoom: 80%;" />
+
+按照我的理解就是：点是父级，两条虚线是子集，点的坐标通过`dt`参数实现每前进一帧时改变它的坐标，从而达到运动效果，两条虚线通过`become()`函数实现不断的刷新，与点的位置相关联。
+
+### `ValueTracker`
+
+我的理解就是一个跟踪者，时刻记录某个值得变化，并将这种变化反映到某个物体上。
+
+```python
+class Wheel(MovingCameraScene,GraphScene):
+    def construct(self):
+        self.camera.frame.move_to(2 * RIGHT)
+        r = 1
+        o = Dot(radius=0.07,color=GREEN).shift(UP)
+        p = Dot(radius=0.07,color=RED)
+        q = p.deepcopy()
+        w = p.deepcopy()
+        c = Circle(arc_center=o.get_center(),radius=r,color=BLUE)
+        arrow = Arrow(o.get_center(),p.get_center(),buff=0,color=YELLOW)
+        l = Line(p,w,color="#99CC33")
+        theta = ValueTracker(0)
+        def get_o(theta):
+            return (theta*r*RIGHT+UP)
+        o.add_updater(
+            lambda o:o.move_to(get_o(theta.get_value()))
+        )
+        c.add_updater(
+            lambda c:c.move_to(o.get_center())
+        )
+        def get_p(theta):
+            return (RIGHT*r*(theta-np.sin(theta))+UP*r*(1-np.cos(theta)))
+        p.add_updater(
+            lambda p:p.move_to(get_p(theta.get_value()))
+        )
+        def get_w(theta):
+            return (theta * r * RIGHT)
+        w.add_updater(
+            lambda d:d.move_to(get_w(theta.get_value()))
+        )
+        arrow.add_updater(
+            lambda mob:mob.become(
+                Arrow(
+                    o.get_center(),
+                    p.get_center(),
+                    buff=0,
+                    color=YELLOW
+                )
+            )
+        )
+        l.add_updater(
+            lambda l:l.become(
+                Line(q.get_center(),w.get_center(),color="#99CC33")
+            )
+        )
+        self.add(o,p,c,arrow,l,q,w)
+        self.wait()
+        self.play(
+            theta.increment_value,2*PI,
+            run_time=8
+        )
+```
+
+输出结果：
+
+![](./video/3.gif)
+
+[返回目录](#目录)
+
+---
+
+# `Camera`部分
+
+## `Camera`类
+
+### 配置
+
+```python
+CONFIG = {
+        "background_image": None,	# 图片背景，可以用绝对路径
+        "pixel_height": DEFAULT_PIXEL_HEIGHT,	# 像素高度，默认1440
+        "pixel_width": DEFAULT_PIXEL_WIDTH,		# 像素宽度，默认2560
+        "frame_rate": DEFAULT_FRAME_RATE,		# 帧速率
+        # Note: frame height and width will be resized to match
+        # the pixel aspect ratio
+        "frame_height": FRAME_HEIGHT,	# 画面高度
+        "frame_width": FRAME_WIDTH,		# 画面宽度
+        "frame_center": ORIGIN,			# 镜头焦点
+        "background_color": BLACK,		# 背景颜色
+        "background_opacity": 1,		# 背景不透明度
+        # Points in vectorized mobjects with norm greater
+        # than this value will be rescaled.
+        "max_allowable_norm": FRAME_WIDTH,
+        "image_mode": "RGBA",
+        "n_channels": 4,
+        "pixel_array_dtype": 'uint8',
+        # z_buff_func is only used if the flag above is set to True.
+        # round z coordinate to nearest hundredth when comparring
+        "z_buff_func": lambda m: np.round(m.get_center()[2], 2),
+        "cairo_line_width_multiple": 0.01,
+        "open_plot_depth":True,
+    }
+```
+
+在`CONFIG`中配置摄像头:
+
+```python
+class CameraTest(Scene):
+    CONFIG = {
+        "camera_config":{
+            "background_image":r"C:\Users\MuxiLi\Pictures\Saved Pictures\阳菜 (2).jpg"
+        }
+    }
+    def construct(self):
+        tex = TexMobject("hello")
+        self.add(tex)
+```
+
+输出结果：其他的属性也可以这样配置。
+
+<img src="./img/18.png" style="zoom:50%;" />
+
+### 部分相关函数
+
+* `reset_pixel_shape(self, new_height, new_width)`
+
+> 功能
+
+重新设置一个像素的大小。
+
+> parameters
+
+`new_height`：新设置的像素高度。
+
+`new_width`：新设置的像素的宽度。
+
+* `get_pixel_height(self)`
+
+> 功能
+
+获取当前场景像素的高度。
+
+* `get_pixel_width(self)`
+
+> 功能
+
+获取当前场景像素的宽度。
+
+* `get_frame_height(self)`
+
+> 功能
+
+获取当前画面高度。
+
+* `get_frame_width(self)`
+
+> 功能
+
+获取当前画面的宽度。
+
+* `get_frame_center(self)`
+
+> 功能
+
+获取当前镜头的焦点。
+
+* `set_frame_height(self, frame_height)`
+
+> 功能
+
+设置画面的高度。
+
+> parameters
+
+`frame_height`：画面高度。
+
+* `set_frame_width(self, frame_width)`
+
+> 功能
+
+设置画面的宽度。
+
+> parameters
+
+`frame_width`：画面宽度。
+
+* `set_frame_center(self, frame_center)`
+
+> 功能
+
+设置镜头焦点。
+
+> parameters
+
+`frame_center`：镜头焦点坐标。
+
+* `is_in_frame(self, mobject)`
+
+> 功能
+
+判断物体`mobject`是否在画面中。
+
+~~算了，后面的函数看不懂。~~
+
+[返回目录](#目录)
