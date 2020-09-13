@@ -1,5 +1,5 @@
 from manimlib.imports import *
-from tutorial.screen_grid import Grid
+
 
 
 class MetaballsGrid(VGroup):
