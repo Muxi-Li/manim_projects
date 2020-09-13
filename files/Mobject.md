@@ -2,21 +2,30 @@
 
 - [x] `def reset_points(self)`：介绍`points`属性。
 - [x] `def generate_target`：做一个动画。
-- [ ] `self.submobjects`：有什么作用？
+- [x] `self.submobjects`：有什么作用？
 - [ ] `Triangle`在`shift`等变换之后，解决顶点坐标不会更新的问题。
-- [ ] `add_updater()`：做一个动画。
-- [ ] `self.apply_points_function_about_point`原理，`self.points`的作用。
+- [x] `add_updater()`：做一个动画。
+- [x] `self.apply_points_function_about_point`原理，`self.points`的作用。
 - [ ] `rotate`旋转的不同。
 - [ ] `self.flip()`的细节。
+- [ ] `def apply_matrix()`功能。
+- [ ] `def apply_complex_function()`功能。
+- [ ] `def wag()`实现细节。
+- [ ] `def reverse_points()`功能。
+- [ ] `def repeat()`功能。
+- [ ] `def shift_onto_screen()`功能。
+- [ ] `def next_to()`参数设置。
 
 ## 目录
 
 * [前言](#前言)
-
+* [updater](#updater)
+  * [一般用法](#一般用法)
+  * [包含dt参数](#包含dt参数)
+  * [ValueTracker](#ValueTracker)
 * [Mobject类](#Mobject类)
   * [CONFIG属性](#CONFIG属性)
   * [相关函数](#相关函数)
-
 * [VMobject类](#VMobject类)
 
 
@@ -26,6 +35,207 @@
 `Mobject`是用数学描述的对象，是屏幕中出现的所有物体的基类。
 
 ---
+
+## `updater`
+
+### 一般用法
+
+`text`跟着`dot`一起移动，就像给`text`添加了个约束条件。
+
+```python
+class AddUpdater1(Scene):
+    def construct(self):
+        dot = Dot()
+        text = TextMobject("Label").next_to(dot,RIGHT,buff=SMALL_BUFF)
+        self.add(dot,text)
+
+        # Update function
+        def update_text(obj):
+            obj.next_to(dot,RIGHT,buff=SMALL_BUFF)
+        # Add update function to the objects
+        text.add_updater(update_text)	# text就是update_text()的obj参数
+        # Add the object again
+        self.add(text)
+        self.play(dot.shift,UP*2)
+        # Remove update function
+        text.remove_updater(update_text)
+        self.wait()
+```
+
+输出结果：
+
+![](../video/2.gif)
+
+### 包含`dt`参数
+
+```python
+class UpdateDemo(Scene):
+    def construct(self):
+        triangle = Triangle()
+        self.rec = Rectangle(height=0.2, width=5, color=YELLOW_C).next_to(triangle, UP, 0.05)
+        c = Circle(radius=0.2).next_to(self.rec,UP,0)
+        # 把圆加入矩形的子物体，让他们update同时进行
+        self.rec.add(c)
+        self.P = c.get_center()
+        self.O = triangle.get_vertices()[0]
+        self.angle = 0
+        self.sig = 1    # 1表示上升，-1表示下降
+        self.rec.add_updater(self.update_rec)
+        c.add_updater(self.update_cir)
+        # 这里self.add(rec)就行了
+        self.add(self.rec, triangle)
+        self.wait(10)
+
+    def update_rec(self, mob, dt):
+        sig = self.sig
+        angle = self.angle
+        if angle >= 30 or angle <= -30:
+            sig *= -1
+        rate = 20 * sig * dt
+        mob.rotate(rate*DEGREES, about_point=self.O)
+        self.angle += rate
+        self.sig = sig
+
+    def update_cir(self,mob,dt):
+        x = 5/3*dt*np.cos(self.angle*PI/180)
+        y = 5/3*dt*np.sin(self.angle*PI/180)
+        coord = np.array([x,y,0])
+        if self.sig == 1:
+            mob.move_to(mob.get_center()-coord)
+        else:
+            mob.move_to(mob.get_center()+coord)
+```
+
+输出结果：
+
+![](../video/14.gif)
+
+```python
+from manimlib.imports import *
+from tutorial.screen_grid import ScreenGrid
+class MetaballsGrid(VGroup):
+    CONFIG = {
+        "side_length": 0.8,
+    }
+
+    def __init__(self, rows, columns, **kwargs):
+        digest_config(self, kwargs, locals())
+        super().__init__(**kwargs)
+        squares = VGroup(
+            *[Square(side_length=self.side_length, stroke_width=1) for _ in range(self.rows * self.columns)])
+        squares.arrange_in_grid(n_rows=self.rows, n_cols=self.columns, buff=0)
+        dots = VGroup(*[Dot(point=squa.get_center(), radius=0.05) for squa in squares])
+        self.add(squares, dots)
+
+
+class MetaballScene(Scene):
+    def construct(self):
+        mgrid = MetaballsGrid(11, 18)
+        self.c1 = Circle(radius=0.5, velocity=(RIGHT * 2 + UP) * 2e-2)
+        self.c2 = Circle(radius=0.8, velocity=(LEFT * 2 + UP) * 2e-2)
+        self.c3 = Circle(radius=1.0, velocity=(RIGHT * 2 + DOWN) * 2e-2)
+        self.c1.add_updater(self.update_circle)
+        self.c2.add_updater(self.update_circle)
+        self.c3.add_updater(self.update_circle)
+        mgrid.add_updater(self.update_mgrid)
+        self.add(mgrid, self.c1, self.c2, self.c3)
+        self.wait(30)
+
+    def update_circle(self, mob, dt):
+        velocity = mob.velocity
+        mob.shift(velocity)
+        if abs(mob.get_center()[1]) > (FRAME_HEIGHT - mob.get_height()) / 2:
+            velocity[1] *= -1
+        if abs(mob.get_center()[0]) > (FRAME_WIDTH - mob.get_width()) / 2:
+            velocity[0] *= -1
+        mob.velocity = velocity
+
+    def update_mgrid(self, mob):
+        # squares = mob[0]
+        for squa in mob[0]:
+            cen = squa.get_center()
+            f = self.get_space(cen)
+            if f > 1:
+                squa.set_fill(RED_C, opacity=1)
+            else:
+                squa.set_fill(opacity=0)
+        # mob[0] = squares
+
+    def get_space(self, cen):
+        x_list = [cen[0]] * 3
+        y_list = [cen[1]] * 3
+        xi_list = [c.get_center()[0] for c in [self.c1, self.c2, self.c3]]
+        yi_list = [c.get_center()[1] for c in [self.c1, self.c2, self.c3]]
+        r_list = [0.5, 0.8, 1.0]
+        return sum(list(map(self.func, x_list, y_list, xi_list, yi_list, r_list)))
+
+    def func(self, x, y, xi, yi, r):
+        return r ** 2 / ((x - xi) ** 2 + (y - yi) ** 2)
+```
+
+输出结果：
+
+![](../video/16.gif)
+
+### `ValueTracker`
+
+```python
+class Wheel(MovingCameraScene,GraphScene):
+    def construct(self):
+        self.camera.frame.move_to(2 * RIGHT)
+        r = 1
+        o = Dot(radius=0.07,color=GREEN).shift(UP)
+        p = Dot(radius=0.07,color=RED)
+        q = p.deepcopy()
+        w = p.deepcopy()
+        c = Circle(arc_center=o.get_center(),radius=r,color=BLUE)
+        arrow = Arrow(o.get_center(),p.get_center(),buff=0,color=YELLOW)
+        l = Line(p,w,color="#99CC33")
+        theta = ValueTracker(0)
+        def get_o(theta):
+            return (theta*r*RIGHT+UP)
+        o.add_updater(
+            lambda o:o.move_to(get_o(theta.get_value()))
+        )
+        c.add_updater(
+            lambda c:c.move_to(o.get_center())
+        )
+        def get_p(theta):
+            return (RIGHT*r*(theta-np.sin(theta))+UP*r*(1-np.cos(theta)))
+        p.add_updater(
+            lambda p:p.move_to(get_p(theta.get_value()))
+        )
+        def get_w(theta):
+            return (theta * r * RIGHT)
+        w.add_updater(
+            lambda d:d.move_to(get_w(theta.get_value()))
+        )
+        arrow.add_updater(
+            lambda mob:mob.become(
+                Arrow(
+                    o.get_center(),
+                    p.get_center(),
+                    buff=0,
+                    color=YELLOW
+                )
+            )
+        )
+        l.add_updater(
+            lambda l:l.become(
+                Line(q.get_center(),w.get_center(),color="#99CC33")
+            )
+        )
+        self.add(o,p,c,arrow,l,q,w)
+        self.wait()
+        self.play(
+            theta.increment_value,2*PI,
+            run_time=8
+        )
+```
+
+输出结果：
+
+![](../video/3.gif)
 
 ## `Mobject`类
 
@@ -112,6 +322,8 @@ np.array([[-2,1,0],[-0.666667,1,0],......])
 > 功能
 
 将`mobjects`添加进该对象的`submobjects`属性，也就是子对象。
+
+这里还是挺有用的，比如说给物体加个`update`函数，那么它的子物体也会在同一时间`update`，同步实现，会减少很多问题。
 
 > parameters
 
@@ -246,7 +458,21 @@ class Bezier_Test(Scene):
 
 > example
 
-[MoveToTarget](https://elteoremadebeethoven.github.io/manim_3feb_docs.github.io/html/tree/animations/transform.html)
+```python
+class MoveToTarget_Test(Scene):
+    def construct(self):
+        rec = Rectangle()
+        rec.generate_target()
+        rec.target.move_to(2*RIGHT)
+        self.play(
+            MoveToTarget(rec)
+        )
+        self.wait()
+```
+
+输出结果：
+
+![](../video/13.gif)
 
 #### `def update(self, dt=0, recursive=True)`
 
@@ -254,7 +480,7 @@ class Bezier_Test(Scene):
 
 更新自身对象，做复杂动画的基础。
 
-`self.updaters`里面包含了用于更新对象状态的函数，等于每过`dt`时间就将对象传入`updater`中更新状态，进而生成动画。
+`self.updaters`里面包含了用于更新对象状态的函数，等于每过`dt`时间就将对象传入`updater`中更新状态，进而生成动画，也就是**每一帧**都会更新物体。
 
 > parameters
 
@@ -302,7 +528,47 @@ class Bezier_Test(Scene):
 
 > example
 
+```python
+class UpdateDemo(Scene):
+    def construct(self):
+        triangle = Triangle()
+        self.rec = Rectangle(height=0.2, width=5, color=YELLOW_C).next_to(triangle, UP, 0.05)
+        c = Circle(radius=0.2).next_to(self.rec,UP,0)
+        # 把圆加入矩形的子物体，让他们update同时进行
+        self.rec.add(c)
+        self.P = c.get_center()
+        self.O = triangle.get_vertices()[0]
+        self.angle = 0
+        self.sig = 1    # 1表示上升，-1表示下降
+        self.rec.add_updater(self.update_rec)
+        c.add_updater(self.update_cir)
+        # 这里self.add(rec)就行了
+        self.add(self.rec, triangle)
+        self.wait(10)
 
+    def update_rec(self, mob, dt):
+        sig = self.sig
+        angle = self.angle
+        if angle >= 30 or angle <= -30:
+            sig *= -1
+        rate = 20 * sig * dt
+        mob.rotate(rate*DEGREES, about_point=self.O)
+        self.angle += rate
+        self.sig = sig
+
+    def update_cir(self,mob,dt):
+        x = 5/3*dt*np.cos(self.angle*PI/180)
+        y = 5/3*dt*np.sin(self.angle*PI/180)
+        coord = np.array([x,y,0])
+        if self.sig == 1:
+            mob.move_to(mob.get_center()-coord)
+        else:
+            mob.move_to(mob.get_center()+coord)
+```
+
+输出结果：
+
+![](../video/14.gif)
 
 #### `def remove_updater(self, update_function)`
 
@@ -370,6 +636,10 @@ class Bezier_Test(Scene):
 
 `vectors`：向量组。
 
+> principle
+
+<img src="../img/26.png" style="zoom:50%;" />
+
 #### `def scale(self, scale_factor, **kwargs)`
 
 > 功能
@@ -379,6 +649,10 @@ class Bezier_Test(Scene):
 > parameters
 
 `scale_factor`：缩放因子。
+
+> principle
+
+<img src="../img/27.png" style="zoom:60%;" />
 
 #### `def rotate_about_origin(self, angle, axis=OUT, axes=[])`
 
@@ -394,6 +668,10 @@ class Bezier_Test(Scene):
 
 `axes`：轴方向，跟`numpy`数组有关，有兴趣自己研究。
 
+> principle
+
+首先获得一个旋转角度的矩阵，然后将`points`矩阵与转换矩阵相乘。
+
 #### `def rotate(self, angle, axis=OUT, **kwargs)`
 
 > 功能
@@ -407,6 +685,10 @@ class Bezier_Test(Scene):
 `axis`：旋转轴方向。
 
 `**kwargs`：可以包含`about_point`参数。
+
+> parameters
+
+原理跟上面一样。
 
 #### `def flip(self, axis=UP, **kwargs)`
 
@@ -422,9 +704,165 @@ class Bezier_Test(Scene):
 
 > 功能
 
+拉长或延伸的效果。
+
+> parameters
+
+`factor`：延伸因子。
+
+`dim`：`0`表示`x`轴，`1`表示`y`轴，`2`表示`z`轴。
+
+#### `def apply_function(self, function, **kwargs)`
+
+> 功能
+
+将`self.points`应用于`function`。
+
+#### `def apply_function_to_position(self, function)`
+
+> 功能
+
+将自己的位置坐标传进`function`输出新的坐标，然后`move_to`到那里。
+
+> parameters
+
+`function`：改变位置的函数。
+
+#### `def apply_function_to_submobject_positions(self, function)`
+
+> 功能
+
+通过函数改变子物体的位置。
+
+> parameters
+
+`function`：改变位置的函数。
+
+#### `def apply_matrix(self, matrix, **kwargs)`
+
+> 功能
+
+还不清楚。
+
+#### `def apply_complex_function(self, function, **kwargs)`
+
+> 功能
+
+将`points`应用于复数函数，还不知道具体怎么用。
+
+#### `def wag(self, direction=RIGHT, axis=DOWN, wag_factor=1.0)`
+
+> 功能
+
+将子物体作出类似波浪的效果。
+
+#### `def reverse_points(self)`
+
+> 功能
+
+未知，pass。
+
+#### `def repeat(self, count)`
+
+`TODO`
+
+#### `def apply_points_function_about_point(self, func, about_point=None, about_edge=None)`
+
+`TODO`
+
+#### `def rotate_in_place(self, angle, axis=OUT)`
+
+`TODO`
+
+#### `def scale_in_place(self, scale_factor, **kwargs)`
+
+`TODO`
+
+#### `def scale_about_point(self, scale_factor, point)`
+
+`TODO`
+
+#### `def pose_at_angle(self, **kwargs)`
+
+`TODO`
+
+#### `def center(self)`
+
+> 功能
+
+使物体位于屏幕中心。
+
+> example
+
+```python
+class CenterDemo(Scene):
+    def construct(self):
+        rec = Rectangle().shift(2*RIGHT)
+        self.play(ShowCreation(rec))
+        self.wait()
+        self.play(
+            rec.center
+        )
+        self.wait()
+```
+
+输出结果：
+
+![](../video/15.gif)
+
+#### `def align_on_border(self, direction, buff=DEFAULT_MOBJECT_TO_EDGE_BUFFER)`
+
+> 功能
+
+使物体右对齐，相对于屏幕，联想word中的右对齐就可以了。
+
+> parameters
+
+`direction`：对齐的方向。
+
+`buff`：距离。
+
+#### `def to_corner(self, corner=LEFT + DOWN, buff=DEFAULT_MOBJECT_TO_EDGE_BUFFER)`
+
+> 功能
+
+使物体移到角落。
+
+> parameters
+
+`corner`：角落的位置，`UL` `UR` `DL` `DR`
+
+`buff`：距离。
+
+#### `def to_edge(self, edge=LEFT, buff=DEFAULT_MOBJECT_TO_EDGE_BUFFER)`
+
+> 功能
+
+将物体移到到边界。
+
+#### `def next_to()`
+
+> 功能
+
+字面意思，移动到另一个物体或者点的旁边。
+
+#### `def shift_onto_screen(self, **kwargs)`
+
+`TODO`
+
+
+
+
+
+
+
+
+
 
 
 ---
+
+
 
 ## `VMobjct`类
 
