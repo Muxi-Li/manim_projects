@@ -926,7 +926,7 @@ class CameraTest(MovingCameraScene):
 
 输出结果：
 
-![gif](./video/4.gif)
+![gif](./gif/4.gif)
 
 可以实现将一些细节放大的效果。
 
@@ -952,7 +952,7 @@ class CameraTest(MovingCameraScene):
 
 输出结果：~~world打错了~~
 
-![](./video/5.gif)
+![](./gif/5.gif)
 
 [返回目录](#目录)
 
@@ -1042,7 +1042,7 @@ class CameraTest(ZoomedScene):
 
 输出结果：
 
-![](./video/6.gif)
+![](./gif/6.gif)
 
 ### 跟踪镜头
 
@@ -1120,7 +1120,7 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 输出结果：
 
-![](./video/7.gif)
+![](./gif/7.gif)
 
 不知为什么放大镜头对于线的颜色和线宽不能有效体现出来。
 
@@ -1144,7 +1144,7 @@ class ZoomedCameraMoveAlongPath(ZoomedScene):
 
 输出结果：
 
-![](./video/8.gif)
+![](./gif/8.gif)
 
 * `get_zoomed_display_pop_out_animation(self, **kwargs)`
 
@@ -1212,7 +1212,7 @@ class MultiSceneDemo(MultiScene):
 
 输出结果：
 
-![](./video/12.gif)
+![](./gif/12.gif)
 
 结合上面的跟踪镜头，可以让多个镜头实现跟踪效果。
 
@@ -1325,7 +1325,7 @@ class ZoomedCameraMoveAlongPath2(MultiScene):
 
 输出结果：
 
-![](./video/10.gif)
+![](./gif/10.gif)
 
 不过我觉得一般的视频放两个镜头都不错了，而且这个类用起来太麻烦了，需要在外面修改好多东西（矩形颜色和位置）,所以后面考虑在配置参数中直接设置好。:)
 
@@ -1678,7 +1678,7 @@ class AddUpdater1(Scene):
 
 输出结果：
 
-![](./video/2.gif)
+![](./gif/2.gif)
 
 使用` text.add_updater(update_text)`将`label`与点绑定在一起，一起运动。
 
@@ -1756,7 +1756,7 @@ class UpdateDemo1(GraphScene):
 
 
 
-<img src="./video/1.gif" style="zoom: 80%;" />
+<img src="./gif/1.gif" style="zoom: 80%;" />
 
 按照我的理解就是：点是父级，两条虚线是子集，点的坐标通过`dt`参数实现每前进一帧时改变它的坐标，从而达到运动效果，两条虚线通过`become()`函数实现不断的刷新，与点的位置相关联。
 
@@ -1820,7 +1820,7 @@ class Wheel(MovingCameraScene,GraphScene):
 
 输出结果：
 
-![](./video/3.gif)
+![](./gif/3.gif)
 
 [返回目录](#目录)
 
